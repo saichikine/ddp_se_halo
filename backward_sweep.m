@@ -13,7 +13,7 @@ function traj = backward_sweep(traj)
     nX = nx + nu + nw;
     
     n_stages = traj.num_stages;
-    % Loop backwards
+    % Loop /backwards
     for k = n_stages-1:-1:1
         
         part_string = "stage update";
@@ -104,7 +104,7 @@ function traj = backward_sweep(traj)
         % Otherwise proceed as normal
         u_predicted = traj.stage{k}.nominal_u + A;
         if norm(u_predicted) > traj.max_thrust_mag
-            %fprintf("Predicted control larger than allowable, ratio is %d.\n",norm(u_predicted)/traj.max_thrust_mag);
+            fprintf("Predicted control larger than allowable, ratio is %d.\n",norm(u_predicted)/traj.max_thrust_mag);
             u_cap = u_predicted/norm(u_predicted)*traj.max_thrust_mag;
             A = u_cap - traj.stage{k}.nominal_u;
             B = zeros(nu, nx);
@@ -127,6 +127,11 @@ function traj = backward_sweep(traj)
             % Safeguard for B 
             B = traj.eta1*norm(A)/max([traj.eta1*norm(A), norm(B*traj.stage{k}.deltax_prev)])*B;
         end
+        
+%         A = 0*A;
+%         B = 0*B;
+%         C = 0*C;
+%         D = 0*D;
         
         % Save matrices for this stage
         traj.stage{k}.A = A; % Feedforward term
