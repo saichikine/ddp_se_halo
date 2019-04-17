@@ -242,7 +242,7 @@ figure
 addToolbarExplorationButtons(gcf)
 scatter3(x_L1, 0, 0, 'rd', 'DisplayName','L1'); hold on
 scatter3(x_L2, 0, 0, 'bd', 'DisplayName','L2');
-scatter3(1-mu_EM, 0, 0, 'kx', 'DisplayName','Second Primary');
+scatter3(1-mu_SE, 0, 0, 'kx', 'DisplayName','Second Primary');
 %scatter3(-mu_EM, 0, 0, 'bx', 'DisplayName', 'First Primary');
 scatter3(initial_state_mass(1), initial_state_mass(2), initial_state_mass(3), 'co','filled','DisplayName','Initial State');
 scatter3(target_state_posvel(1), target_state_posvel(2), target_state_posvel(3), 'mo','filled','DisplayName', 'Target State');

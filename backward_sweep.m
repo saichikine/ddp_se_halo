@@ -99,9 +99,9 @@ function traj = backward_sweep(traj)
         end
         traj.bool_TRQP_failure = false;
         
-%         if ~is_pos_def(Juu)
-%             warning("Juu not positive definite at stage %d.",k)
-%         end
+        if ~is_pos_def(Juu)
+            warning("Juu not positive definite at stage %d.",k)
+        end
         
         % Constrain control to lie along bounds if prediction exceeds
         % constraint
