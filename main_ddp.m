@@ -21,31 +21,31 @@ p = gcp % Start parallel pool if one doesn't exist
 load('environment_SE_spacecraft_cubesat.mat'); % m_sc, exh_vel, and max_thrust_mag are already normalized and loaded here
 fprintf('Loaded spacecraft and environment.\n')
 disp(cubesat);
-load('halo_trans_30_200000L1.mat'); % initial guess for LT transfer from multiple-shooting
+load('halo_trans_ig_100.mat'); % initial guess for LT transfer from multiple-shooting
 fprintf('Loaded initial guess.\n');
 
 %% Plot initial guess
 
-N_ms = 30;
-thrust_flags = ones(N_ms-1,1);
-thrust_flags(1) = 0;
-thrust_flags(end) = 0;
+% Unpack initial guess
+N_ms = ms_results_initial_guess.num_nodes;
+thrust_flags = ms_results_initial_guess.thrust_flags;
 
 nX = 10;
 
-chi = ms_results.free_vars;
-arc_initial_states = reshape(chi(1:10*N_ms),10,[]);
-arc_integration_times = chi(nX*N_ms+1:nX*N_ms+N_ms);
-slack_vars = chi(nX*N_ms+N_ms+1:end);
+chi = ms_results_initial_guess.chi;
+arc_initial_states = ms_results_initial_guess.arc_initial_states;
+arc_integration_times = ms_results_initial_guess.arc_integration_times;
+slack_vars = ms_results_initial_guess.slack_vars;
 
 initial_state_full = arc_initial_states(:,1);
 target_state_full = arc_initial_states(:,end);
 
 ode_opts = odeset('RelTol',1e-13,'AbsTol',1e-20);
 
-X_hist_total = [];
-u_hist_total = [];
-t_hist_total = [];
+X_hist_ig_flight = [];
+thrust_hist_ig_flight = [];
+u_hist_ig_flight = [];
+t_hist_ig_flight = [];
 t_last = 0;
 
 fprintf("Simulating converged trajectory...")
@@ -61,18 +61,19 @@ for i = 1:N_ms-1
     
     % Go back through and compute control history
     for j = 1:length(t_hist_arc)
-        u_hist_total = [u_hist_total; max_thrust_mag*FU*1000*1000*X_hist_arc(j,8:end)];
+        thrust_hist_ig_flight = [thrust_hist_ig_flight; max_thrust_mag*FU*1000*1000*X_hist_arc(j,8:end)];
+        u_hist_ig_flight = [u_hist_ig_flight; X_hist_arc(j,8:end)];
     end
     % Save total state history
-    X_hist_total = [X_hist_total; X_hist_arc];
-    t_hist_total = [t_hist_total; t_hist_arc];
+    X_hist_ig_flight = [X_hist_ig_flight; X_hist_arc];
+    t_hist_ig_flight = [t_hist_ig_flight; t_hist_arc];
 end
 % [t_hist_targ_orb, X_hist_targ_orb] = ode113(@(t,X) CR3BP_cart_control(t,X,mu_SE,exh_vel,max_thrust_mag), [0+t_last, T_L2+t_last], [arc_initial_states(1:7,end); zeros(3,1)], ode_opts);
 % for i = 1:length(t_hist_targ_orb)
-%     u_hist_total = [u_hist_total; zeros(3,1)'];
+%     u_hist_ig_flight = [u_hist_ig_flight; zeros(3,1)'];
 % end
-% X_hist_total = [X_hist_total; X_hist_targ_orb];
-% t_hist_total = [t_hist_total; t_hist_targ_orb];
+% X_hist_ig_flight = [X_hist_ig_flight; X_hist_targ_orb];
+% t_hist_ig_flight = [t_hist_ig_flight; t_hist_targ_orb];
 fprintf("done.\n")
 toc
 
@@ -80,9 +81,9 @@ toc
 figure
 addToolbarExplorationButtons(gcf)
 hold on
-plot(t_hist_total.*TU/60/60/24, u_hist_total(:,1), '.-', 'DisplayName', 'x thrust');
-plot(t_hist_total.*TU/60/60/24, u_hist_total(:,2), '.-', 'DisplayName', 'y thrust');
-plot(t_hist_total.*TU/60/60/24, u_hist_total(:,3), '.-', 'DisplayName', 'z thrust');
+plot(t_hist_ig_flight.*TU/60/60/24, thrust_hist_ig_flight(:,1), '.-', 'DisplayName', 'x thrust');
+plot(t_hist_ig_flight.*TU/60/60/24, thrust_hist_ig_flight(:,2), '.-', 'DisplayName', 'y thrust');
+plot(t_hist_ig_flight.*TU/60/60/24, thrust_hist_ig_flight(:,3), '.-', 'DisplayName', 'z thrust');
 hold off
 xlabel('Time [days]')
 ylabel('Control Thrust [$$mN$$]')
@@ -101,8 +102,8 @@ end
 %plot(X_hist_total_guess(1,1), X_hist_total_guess(1,2), X_hist_total_guess(1,3), 'ok', 'markerfacecolor',[244,179,66]./255, 'DisplayName', 'Initial Point'); hold on
 scatter3(initial_state_full(1), initial_state_full(2), initial_state_full(3), 'x', 'DisplayName', 'Initial Position');
 scatter3(target_state_full(1), target_state_full(2), target_state_full(3), 'x', 'DisplayName', 'Target Position');
-scatter3(X_hist_total(:,1), X_hist_total(:,2), X_hist_total(:,3), 'r.','DisplayName', 'Low-Thrust Transfer Trajectory'); hold on
-quiver3(X_hist_total(:,1),X_hist_total(:,2),X_hist_total(:,3),u_hist_total(:,1),u_hist_total(:,2),u_hist_total(:,3), 1.1,'DisplayName', 'Thrust Vectors'); hold on
+scatter3(X_hist_ig_flight(:,1), X_hist_ig_flight(:,2), X_hist_ig_flight(:,3), 'r.','DisplayName', 'Low-Thrust Transfer Trajectory'); hold on
+quiver3(X_hist_ig_flight(:,1),X_hist_ig_flight(:,2),X_hist_ig_flight(:,3),thrust_hist_ig_flight(:,1),thrust_hist_ig_flight(:,2),thrust_hist_ig_flight(:,3), 1.1,'DisplayName', 'Thrust Vectors'); hold on
 title('Final Low-Thrust Transfer')
 xlabel('x')
 ylabel('y')
@@ -122,63 +123,89 @@ nu = 3; % number of controls
 nw = 0; % number of parameters/static controls
 nl = 6; % number of lagrange multipliers (same as dimension of constraint function)
 
-n_stages = 200;
-M = 1; % number of phases
-
-% Interpolate 
-
-ode_opts = odeset('RelTol',1e-13,'AbsTol',1e-20);
-[t_full,states_full] = ode113(@(t,X) CR3BP_cart_control(t,X,mu_EM,exh_vel,max_thrust_mag), [0 tof], [initial_state; m_sc; zeros(3,1)], ode_opts);
-
-initial_lambda = 0*ones(nl,1);
-
-[t_flight,states_flight] = ode113(@(t,X) CR3BP_cart_control(t,X,mu_SE,exh_vel,max_thrust_mag), [0 tof], [initial_state; zeros(3,1)], ode_opts);
-stage_time_indices = floor(linspace(1,length(t_flight),n_stages));
-stage_times = t_flight(stage_time_indices); % spacing based on ode output
-% stage_times = linspace(0,tof,n_stages); % equally spaced points
-
-% Initial guess ODE parameters
-ode_opts = odeset('RelTol',5e-14,'AbsTol',1e-20);
-
 % Acceptance bounds
-lambda_epsilon_default = 0.1;
-lambda_epsilon = lambda_epsilon_default; % Starting scale factor for multiplier update
 iterate_epsilon = 0.1; % acceptance bound for each iteration, 0.01 is what Lantoine uses
 opt_epsilon = 1e-7; % acceptance bound for expected reduction
 feas_epsilon = 1e-7;
 
 % Penalty weight
-penalty_sigma = 0.1; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
+penalty_sigma = 1; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
 
 % TRQP parameters
 k_sigma = 1.1;
 kappa = 0.1; % LR value
-delta_TRQP_default = 1e-2;
-delta_TRQP_min = 5e-9;
+delta_TRQP_default = 1e-1;
+delta_TRQP_min = 5e-20;
 delta_TRQP_max = 1;
 
 % Gain guard parameters
 eta1 = 5;
 eta2 = 1000;
 
+% Number of stages/phases
+n_stages = 150;
+M = 1; % number of phaess
+
+% Multipliers initial guess
+initial_lambda = 0*ones(nl,1);
+
+% Initial guess and target
+initial_state_mass = [initial_state_full(1:6); m_sc];
+target_state_posvel = target_state_full(1:6);
+
 % Create traj
-traj = struct('num_stages',n_stages,'num_phases',M,'mu',mu_SE,'exh_vel',exh_vel,'normalizers',normalizers,'initial_state',initial_state,'lambda',initial_lambda,'nominal_lambda',initial_lambda,'w',[],'nx',nx,'nu',nu,'nw',nw,'nl',nl,...
-    'stages',[],'stage_times',stage_times,'deltaw',[],'deltal',[],'ER_phase',[],'J_nom',[],'h_nom',[],'f_nom',[],...
+traj = struct('num_stages',n_stages,'num_phases',M,'mu',mu_SE,'exh_vel',exh_vel,'normalizers',normalizers,'initial_state',initial_state_mass,'lambda',initial_lambda,'nominal_lambda',initial_lambda,'w',[],'nx',nx,'nu',nu,'nw',nw,'nl',nl,...
+    'stages',[],'stage_times',[],'deltaw',[],'deltal',[],'ER_phase',[],'J_nom',[],'h_nom',[],'f_nom',[],...
     'max_thrust_mag',max_thrust_mag,'eta1',eta1,'eta2',eta2,'bool_TRQP_failure',[],...
-    'lambda_epsilon',lambda_epsilon,'iterate_epsilon',iterate_epsilon,'opt_epsilon',opt_epsilon,'feas_epsilon',feas_epsilon,'penalty_sigma',penalty_sigma,'k_sigma',k_sigma,...
+    'iterate_epsilon',iterate_epsilon,'opt_epsilon',opt_epsilon,'feas_epsilon',feas_epsilon,'penalty_sigma',penalty_sigma,'k_sigma',k_sigma,...
     'kappa',kappa,'delta_TRQP',delta_TRQP_default,'delta_TRQP_min',delta_TRQP_min,'delta_TRQP_max',delta_TRQP_max,...
     'compute_STMs',@compute_STMs_ser,'initialize',@initialize,'local_ctg_derivs',@L_derivs,'augmented_lagrangian_derivs',@phitilde_derivs,...
-    'compute_constraintvec',@(traj) constraint_vec(traj,target_state),'compute_f',@compute_f,'compute_h',@compute_h,'compute_J',@compute_J,...
+    'compute_constraintvec',@(traj) constraint_vec(traj,target_state_posvel),'compute_f',@compute_f,'compute_h',@compute_h,'compute_J',@compute_J,...
     'stage_cost',@stage_cost,'terminal_cost',@terminal_cost,'augmented_lagrangian',@augmented_lagrangian);
 
+%% Get initial guess from multiple shooting and finish DDP setup
+
+% Stage times
+time_spacing_nonlinear_flag = 0;
+if time_spacing_nonlinear_flag
+    stage_time_indices = floor(linspace(1,length(t_hist_ig_flight),n_stages));
+    stage_times = t_hist_ig_flight(stage_time_indices); % spacing based on ode output
+    
+    % Initial guess controls
+    u_stage_ig = u_hist_ig_flight(stage_time_indices,:)';
+else
+    if n_stages == ms_results_initial_guess(1).num_nodes
+        
+        stage_times = [0; cumsum(arc_integration_times)];
+
+        % Initial guess controls
+        u_stage_ig = arc_initial_states(8:end,:);
+    else
+        stage_times = linspace(0,t_hist_ig_flight(end),n_stages);
+        [t_hist_ig_flight, indices] = unique(t_hist_ig_flight);
+        u_stage_ig = interp1(t_hist_ig_flight,u_hist_ig_flight(indices,:),stage_times,'nearest');
+        u_stage_ig = u_stage_ig';
+    end
+end
+
+% Cap controls if above max
+for i = 1:length(u_stage_ig)
+    if norm(u_stage_ig(:,i)) > 1
+        u_stage_ig(:,i) = u_stage_ig(:,i)/norm(u_stage_ig(:,i));
+    end
+end
+
+
+traj.stage_times = stage_times;
+
 % Initialize traj with initial guess
-current_state = initial_state;
+current_state = initial_state_mass;
 % First stage is separate
-u_ig = zeros(nu,1);
+u_ig = u_stage_ig(:,1);
 traj.stage{1} = struct('nominal_state',current_state,'state',current_state,'time',stage_times(1),'nominal_u',u_ig,'u',u_ig,'A',[],'B',[],'C',[],'D',[],...
         'JX_star',[],'Jl_star',[],'JXX_star',[],'Jll_star',[],'JXl_star',[],'STM',[],'STT',[],'ER',[],'deltax',[],'deltax_prev',zeros(nx,1)); % deltax_prev is zero at first iteration
 for i = 1:n_stages-1
-    u_ig = zeros(nu,1);
+    u_ig = u_stage_ig(:,i);
     [~,stage_states] = ode113(@(t,X) CR3BP_cart_control(t,X,traj.mu,exh_vel,max_thrust_mag), [stage_times(i), stage_times(i+1)], [current_state; u_ig], ode_opts);
     current_state = stage_states(end,1:7)';
     
@@ -202,7 +229,8 @@ fprintf("Done initializing.\n")
 
 u = NaN(nu,traj.num_stages);
 for k = 1:traj.num_stages
-    u(:,k) = traj.max_thrust_mag*FU*1000*1000.*traj.stage{k}.u; % FU is in kN; multiply by FU to get kN, then convert to mN
+    u(:,k) = traj.max_thrust_mag*FU*1000*1000.*(traj.stage{k}.u);%-traj.stage{k}.nominal_u); % FU is in kN; multiply by FU to get kN, then convert to mN
+    %fprintf("u diff at stage %i is:\n %d\n%d\n%d\n",k,u(1,k),u(2,k),u(3,k));
 end
 
 states = NaN(nx,traj.num_stages);
@@ -216,13 +244,19 @@ scatter3(x_L1, 0, 0, 'rd', 'DisplayName','L1'); hold on
 scatter3(x_L2, 0, 0, 'bd', 'DisplayName','L2');
 scatter3(1-mu_EM, 0, 0, 'kx', 'DisplayName','Second Primary');
 %scatter3(-mu_EM, 0, 0, 'bx', 'DisplayName', 'First Primary');
-scatter3(initial_state(1), initial_state(2), initial_state(3), 'co','filled','DisplayName','Initial State');
-scatter3(target_state(1), target_state(2), target_state(3), 'mo','filled','DisplayName', 'Target State');
+scatter3(initial_state_mass(1), initial_state_mass(2), initial_state_mass(3), 'co','filled','DisplayName','Initial State');
+scatter3(target_state_posvel(1), target_state_posvel(2), target_state_posvel(3), 'mo','filled','DisplayName', 'Target State');
 plot3(states(1,:), states(2,:), states(3,:), '-o', 'DisplayName','Trajectory');
 quiver3(states(1,:), states(2,:), states(3,:), u(1,:), u(2,:), u(3,:), 1.1, 'DisplayName', 'Thrust Vectors');
 hold off
 grid on
 legend();
+h = get(gca,'DataAspectRatio');
+if h(3)==1
+      set(gca,'DataAspectRatio',[1 1 1])
+else
+      set(gca,'DataAspectRatio',[1 1 1])
+end
 
 figure
 addToolbarExplorationButtons(gcf)
@@ -288,7 +322,6 @@ while ~bool_converged
     
     % Initialize before each iteration
     traj = traj.initialize(traj);
-    traj.lambda_epsilon = lambda_epsilon_default;
 %     traj.delta_TRQP = delta_TRQP_default;
     
     bool_failed = false;
@@ -337,9 +370,6 @@ while ~bool_converged
         bool_accept_iterate = false;
         rho = (Jnew - traj.J_nom)/traj.ER_phase;
         fprintf("rho is %d.\n",rho)
-        if abs(rho) >= 1e10 || abs(traj.lambda_epsilon) <= 1e-11
-            error("rho is %d, epsilon is %d. Terminating.\n", rho, traj.lambda_epsilon);
-        end
         if (rho) <= 1+traj.iterate_epsilon && (rho) >= 1-traj.iterate_epsilon
             traj.delta_TRQP = min([(1+traj.kappa)*traj.delta_TRQP, traj.delta_TRQP_max]); % LR eq 56
             fprintf('TRQP delta is %d.\n',traj.delta_TRQP)
