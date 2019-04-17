@@ -36,30 +36,30 @@ function Xdot = CR3BP_cart_control_STMSTT(t,X,mu,c,Tmax)
     fXXten = double(fXX(X,c,mu,Tmax));
 
     STTdot = zeros(size(STT));
-%     temp = zeros(size(STT));
-%     for i = 1:10
-%         temp(i,:,:) = STM'*squeeze(fXXten(i,:,:))*STM;
-%     end
-%     for i = 1:10
-%         STTdot(:,:,i) = fXmat*STT(:,:,i) + temp(:,:,i);
-%     end
+    temp = zeros(size(STT));
+    for i = 1:10
+        temp(i,:,:) = STM'*squeeze(fXXten(i,:,:))*STM;
+    end
+    for i = 1:10
+        STTdot(:,:,i) = fXmat*STT(:,:,i) + temp(:,:,i);
+    end
 
     % Naive STTdot calculation
-    for i = 1:10
-        for j = 1:10
-            for k = 1:10
-                comp1 = 0;
-                comp2 = 0;
-                for gam1 = 1:10
-                    comp1 = comp1 + fXmat(i,gam1)*STT(gam1,j,k); % matrix part
-                    for gam2 = 1:10
-                        comp2 = comp2 + fXXten(i,gam1,gam2)*STM(gam1,j)*STM(gam2,k); % tensor part
-                    end
-                end
-                STTdot(i,j,k) = comp1 + comp2;
-            end
-        end
-    end
+%     for i = 1:10
+%         for j = 1:10
+%             for k = 1:10
+%                 comp1 = 0;
+%                 comp2 = 0;
+%                 for gam1 = 1:10
+%                     comp1 = comp1 + fXmat(i,gam1)*STT(gam1,j,k); % matrix part
+%                     for gam2 = 1:10
+%                         comp2 = comp2 + fXXten(i,gam1,gam2)*STM(gam1,j)*STM(gam2,k); % tensor part
+%                     end
+%                 end
+%                 STTdot(i,j,k) = comp1 + comp2;
+%             end
+%         end
+%     end
     %% Repack
     Xdot = [xdot; ydot; zdot; xddot; yddot; zddot; mdot; 0; 0; 0; reshape(STMdot,[],1); reshape((STTdot),[],1)];
     

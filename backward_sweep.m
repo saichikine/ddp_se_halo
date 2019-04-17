@@ -90,7 +90,7 @@ function traj = backward_sweep(traj)
         
         % TRQP
         feedback_scaling_matrix = 1/traj.max_thrust_mag^2.*eye(3);
-        %feedback_scaling_matrix = eye(3);
+        feedback_scaling_matrix = eye(3);
         [A, Juu_t, bool_TRQP_failure] = trqp_new(Juu,Ju,traj.delta_TRQP,feedback_scaling_matrix,'Newton');
         if bool_TRQP_failure
             traj.bool_TRQP_failure = true; % Lets outer DDP loop know TRQP failed
@@ -99,13 +99,17 @@ function traj = backward_sweep(traj)
         end
         traj.bool_TRQP_failure = false;
         
+%         if ~is_pos_def(Juu)
+%             warning("Juu not positive definite at stage %d.",k)
+%         end
+        
         % Constrain control to lie along bounds if prediction exceeds
         % constraint
         % Otherwise proceed as normal
         u_predicted = traj.stage{k}.nominal_u + A;
-        if norm(u_predicted) > traj.max_thrust_mag
-            fprintf("Predicted control larger than allowable, ratio is %d.\n",norm(u_predicted)/traj.max_thrust_mag);
-            u_cap = u_predicted/norm(u_predicted)*traj.max_thrust_mag;
+        if norm(u_predicted) > 1
+            fprintf("Predicted control larger than allowable at stage %i, ratio is %d.\n",k,norm(u_predicted)/1);
+            u_cap = u_predicted/norm(u_predicted);
             A = u_cap - traj.stage{k}.nominal_u;
             B = zeros(nu, nx);
             if nw ~= 0
@@ -142,12 +146,13 @@ function traj = backward_sweep(traj)
         %% Stage Update Equations
         
         ER = traj.stage{k+1}.ER + Ju'*A + 1/2*A'*Juu*A; % Expected reduction
+        %fprintf("Expected reduction is %d at stage %i.\n",ER,k);
         
-        Jx_star = (Jx' + Ju'*B + A'*Juu*B + A'*Jux)';
-        Jw_star = (Jw' + Ju'*C + A'*Juu*C + A'*Juw)';
+        Jx_star = Jx + B'*Ju + B'*Juu'*A + Jux'*A;
+        Jw_star = Jw + C'*Ju + C'*Juu'*A + Juw'*A;
         JX_star = [Jx_star; zeros(nu,1); Jw_star];
 
-        Jl_star = (Jl' + Ju'*D + A'*Juu*D + A'*Jul)';
+        Jl_star = Jl + D'*Ju + D'*Juu'*A + Jul'*A;
 
         Jxx_star = Jxx + B'*Juu*B + B'*Jux + Jux'*B;
         Jww_star = Jww + C'*Juu*C + C'*Juw + Juw'*C;

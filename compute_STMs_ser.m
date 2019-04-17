@@ -1,4 +1,4 @@
-function traj = compute_STMs(traj)
+function traj = compute_STMs_ser(traj)
     
     % Computes first and second order STMs forward in time along stages
     % Modifies variable 'traj'

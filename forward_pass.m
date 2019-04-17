@@ -39,12 +39,13 @@ function traj = forward_pass(traj)
             deltau = zeros(size(deltau));
         end
         u_current = traj.stage{k}.nominal_u + deltau; % Update control
+        %fprintf("deltau is:\n %d\n%d\n%d\n",deltau(1),deltau(2),deltau(3));
         
         % Check for control constraint violations again
-        if norm(u_current) > traj.max_thrust_mag
-            %fprintf("Control exceeds allowable magnitude. Ratio is %d.\n", norm(u_current)/traj.max_thrust_mag);
-            u_current = traj.max_thrust_mag.*u_current./norm(u_current);
-            %fprintf("Using thrusts: Tx = %dmN, Ty = %dmN, Tz = %dmN.\n Total magnitude: %dmN.\n", u_current(1)*1e6*traj.normalizers.force_norm, u_current(2)*1e6*traj.normalizers.force_norm, u_current(3)*1e6*traj.normalizers.force_norm, norm(u_current*1e6*traj.normalizers.force_norm));
+        if norm(u_current) > 1
+            %fprintf("Control exceeds allowable magnitude. Ratio is %d.\n", norm(u_current)/1);
+            u_current = u_current./norm(u_current);
+            %fprintf("Using thrusts: Tx = %dmN, Ty = %dmN, Tz = %dmN.\n Total magnitude: %dmN.\n", u_current(1)*traj.max_thrust_mag*1e6*traj.normalizers.force_norm, u_current(2)*traj.max_thrust_mag*1e6*traj.normalizers.force_norm, u_current(3)*traj.max_thrust_mag*1e6*traj.normalizers.force_norm, norm(u_current*traj.max_thrust_mag*1e6*traj.normalizers.force_norm));
         end
         traj.stage{k}.u = u_current;
         
