@@ -21,7 +21,7 @@ p = gcp % Start parallel pool if one doesn't exist
 load('environment_SE_spacecraft_cubesat.mat'); % m_sc, exh_vel, and max_thrust_mag are already normalized and loaded here
 fprintf('Loaded spacecraft and environment.\n')
 disp(cubesat);
-load('halo_trans_ig_100.mat'); % initial guess for LT transfer from multiple-shooting
+load('halo_trans_ig_100_b.mat'); % initial guess for LT transfer from multiple-shooting
 fprintf('Loaded initial guess.\n');
 
 %% Plot initial guess
@@ -40,7 +40,7 @@ slack_vars = ms_results_initial_guess.slack_vars;
 initial_state_full = arc_initial_states(:,1);
 target_state_full = arc_initial_states(:,end);
 
-ode_opts = odeset('RelTol',1e-13,'AbsTol',1e-20);
+ode_opts = odeset('RelTol',1e-13,'AbsTol',1e-17);
 
 X_hist_ig_flight = [];
 thrust_hist_ig_flight = [];
@@ -129,7 +129,7 @@ opt_epsilon = 1e-7; % acceptance bound for expected reduction
 feas_epsilon = 1e-7;
 
 % Penalty weight
-penalty_sigma = 100; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
+penalty_sigma = 1; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
 
 % TRQP parameters
 k_sigma = 1.1;
@@ -182,8 +182,8 @@ else
         u_stage_ig = arc_initial_states(8:end,:);
     else
         stage_times = linspace(0,t_hist_ig_flight(end),n_stages);
-        [t_hist_ig_flight, indices] = unique(t_hist_ig_flight);
-        u_stage_ig = interp1(t_hist_ig_flight,u_hist_ig_flight(indices,:),stage_times,'linear');
+        [t_hist_ig_flight_u, indices] = unique(t_hist_ig_flight);
+        u_stage_ig = interp1(t_hist_ig_flight_u,u_hist_ig_flight(indices,:),stage_times,'linear');
         u_stage_ig = u_stage_ig';
     end
 end

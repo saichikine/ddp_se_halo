@@ -32,7 +32,7 @@ function traj = compute_STMs_ser(traj)
     %% Integrate
     % We need STMs from time step k to k+1, NOT STMs from 0 to k+1
     
-    ode_opts = odeset('RelTol',5e-14,'AbsTol',1e-20);
+    ode_opts = odeset('RelTol',1e-13,'AbsTol',1e-17);
     
     current_state = traj.initial_state;
     states_post = NaN(nx,traj.num_stages);
