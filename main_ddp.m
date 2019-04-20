@@ -129,7 +129,7 @@ opt_epsilon = 1e-7; % acceptance bound for expected reduction
 feas_epsilon = 1e-7;
 
 % Penalty weight
-penalty_sigma = 1; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
+penalty_sigma = 100; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
 
 % TRQP parameters
 k_sigma = 1.1;
@@ -183,18 +183,18 @@ else
     else
         stage_times = linspace(0,t_hist_ig_flight(end),n_stages);
         [t_hist_ig_flight, indices] = unique(t_hist_ig_flight);
-        u_stage_ig = interp1(t_hist_ig_flight,u_hist_ig_flight(indices,:),stage_times,'nearest');
+        u_stage_ig = interp1(t_hist_ig_flight,u_hist_ig_flight(indices,:),stage_times,'linear');
         u_stage_ig = u_stage_ig';
     end
 end
+u_stage_ig(:,end) = zeros(3,1); % set last stage controls to zero
 
 % Cap controls if above max
-for i = 1:length(u_stage_ig)
-    if norm(u_stage_ig(:,i)) > 1
-        u_stage_ig(:,i) = u_stage_ig(:,i)/norm(u_stage_ig(:,i));
-    end
-end
-
+% for i = 1:length(u_stage_ig)
+%     if norm(u_stage_ig(:,i)) > 1
+%         u_stage_ig(:,i) = u_stage_ig(:,i)/norm(u_stage_ig(:,i));
+%     end
+% end
 
 traj.stage_times = stage_times;
 
@@ -209,7 +209,7 @@ for i = 1:n_stages-1
     [~,stage_states] = ode113(@(t,X) CR3BP_cart_control(t,X,traj.mu,exh_vel,max_thrust_mag), [stage_times(i), stage_times(i+1)], [current_state; u_ig], ode_opts);
     current_state = stage_states(end,1:7)';
     
-    traj.stage{i+1} = struct('nominal_state',current_state,'state',current_state,'time',stage_times(i+1),'nominal_u',u_ig,'u',u_ig,'A',[],'B',[],'C',[],'D',[],...
+    traj.stage{i+1} = struct('nominal_state',current_state,'state',current_state,'time',stage_times(i+1),'nominal_u',u_stage_ig(:,i+1),'u',u_stage_ig(:,i+1),'A',[],'B',[],'C',[],'D',[],...
         'JX_star',[],'Jl_star',[],'JXX_star',[],'Jll_star',[],'JXl_star',[],'STM',[],'STT',[],'ER',[],'deltax',[],'deltax_prev',zeros(nx,1)); 
 end
 

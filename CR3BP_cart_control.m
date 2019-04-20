@@ -23,7 +23,7 @@ function Xdot = CR3BP_cart_control(t,X,mu,c,Tmax)
     yddot = -2*xdot + y - (1-mu)*(y/(r1^3)) - mu*(y)/(r2^3) + (Tmax*uy/m);
     zddot = -(1-mu)*((z)/(r1^3)) - mu*(z)/(r2^3) + (Tmax*uz/m);
     u_epsilon = [1e-8; 1e-10; 1e-12; 1e-16];
-    mdot = -Tmax*sqrt(ux^2 + uy^2 + uz^2 + u_epsilon(1))/c;
+    mdot = -Tmax*sqrt(ux^2 + uy^2 + uz^2 + u_epsilon(2))/c;
     
     %% STM Dynamics
     fXmat = fX(X,c,mu,Tmax);

@@ -41,7 +41,7 @@ function traj = backward_sweep(traj)
         for i = 1:(nx+nu+nw)
             JXX(:,i) = JXX(:,i) + (traj.stage{k+1}.JX_star'*squeeze(STT(:,:,i)))';
         end
-        JXX = JXX + LXX + STM'*traj.stage{k+1}.JXX_star*STM;% + double(ttv(STT,traj.stage{k+1}.JX_star,1));
+        JXX = JXX + LXX + STM'*traj.stage{k+1}.JXX_star'*STM;% + double(ttv(STT,traj.stage{k+1}.JX_star,1));
 
         % Naive calculation of JXX
 %         JXX_s = traj.stage{k+1}.JXX_star;
@@ -99,6 +99,8 @@ function traj = backward_sweep(traj)
         end
         traj.bool_TRQP_failure = false;
         
+        %Juu = Juu_t;
+        
         if ~is_pos_def(Juu)
             warning("Juu not positive definite at stage %d.",k)
         end
@@ -129,7 +131,7 @@ function traj = backward_sweep(traj)
             D = -Juu_inv*Jul;
 
             % Safeguard for B 
-            B = traj.eta1*norm(A)/max([traj.eta1*norm(A), norm(B*traj.stage{k}.deltax_prev)])*B;
+            %B = traj.eta1*norm(A)/max([traj.eta1*norm(A), norm(B*traj.stage{k}.deltax_prev)])*B;
         end
         
 %         A = 0*A;
@@ -278,6 +280,7 @@ function traj = backward_sweep(traj)
     traj.bool_TRQP_failure = false;
     
     Jlplp_t = -Jlplp_t;
+    %Jlplp = Jlplp_t;
     
     Jlplp_inv = inv(Jlplp_t); % Precompute since it's used a bunch of times
     %Alp = -Jlplp_inv*Jlp; % suspect Alp from trqp function is not the same as this (testing shows it's the negative)
