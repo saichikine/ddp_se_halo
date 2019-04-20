@@ -129,7 +129,7 @@ opt_epsilon = 1e-7; % acceptance bound for expected reduction
 feas_epsilon = 1e-7;
 
 % Penalty weight
-penalty_sigma = 1; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
+penalty_sigma = 10; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
 
 % TRQP parameters
 k_sigma = 1.1;
@@ -143,7 +143,7 @@ eta1 = 5;
 eta2 = 1000;
 
 % Number of stages/phases
-n_stages = 150;
+n_stages = 300;
 M = 1; % number of phaess
 
 % Multipliers initial guess
@@ -182,8 +182,9 @@ else
         u_stage_ig = arc_initial_states(8:end,:);
     else
         stage_times = linspace(0,t_hist_ig_flight(end),n_stages);
-        [t_hist_ig_flight_u, indices] = unique(t_hist_ig_flight);
-        u_stage_ig = interp1(t_hist_ig_flight_u,u_hist_ig_flight(indices,:),stage_times,'linear');
+        [t_hist_ig_flight_u, unique_indices] = unique(t_hist_ig_flight);
+        u_hist_ig_flight_u = u_hist_ig_flight(unique_indices,:);
+        u_stage_ig = interp1(t_hist_ig_flight_u,u_hist_ig_flight_u,stage_times,'linear');        
         u_stage_ig = u_stage_ig';
     end
 end
@@ -229,7 +230,7 @@ fprintf("Done initializing.\n")
 
 u = NaN(nu,traj.num_stages);
 for k = 1:traj.num_stages
-    u(:,k) = traj.max_thrust_mag*FU*1000*1000.*(traj.stage{k}.u);%-traj.stage{k}.nominal_u); % FU is in kN; multiply by FU to get kN, then convert to mN
+    u(:,k) = traj.max_thrust_mag*FU*1000*1000.*(traj.stage{k}.nominal_u);%-traj.stage{k}.nominal_u); % FU is in kN; multiply by FU to get kN, then convert to mN
     %fprintf("u diff at stage %i is:\n %d\n%d\n%d\n",k,u(1,k),u(2,k),u(3,k));
 end
 
