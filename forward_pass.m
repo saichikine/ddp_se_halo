@@ -44,7 +44,7 @@ function traj = forward_pass(traj)
         % Check for control constraint violations again
         if norm(u_current) > 1
             %fprintf("Control exceeds allowable magnitude. Ratio is %d.\n", norm(u_current)/1);
-            fprintf("Forward pass: attempted control larger than allowable at stage %i, ratio is %d.\n",k,norm(u_current)/1);
+            %fprintf("Forward pass: attempted control larger than allowable at stage %i, ratio is %d.\n",k,norm(u_current)/1);
             u_current = u_current./norm(u_current);
             %fprintf("Using thrusts: Tx = %dmN, Ty = %dmN, Tz = %dmN.\n Total magnitude: %dmN.\n", u_current(1)*traj.max_thrust_mag*1e6*traj.normalizers.force_norm, u_current(2)*traj.max_thrust_mag*1e6*traj.normalizers.force_norm, u_current(3)*traj.max_thrust_mag*1e6*traj.normalizers.force_norm, norm(u_current*traj.max_thrust_mag*1e6*traj.normalizers.force_norm));
         end

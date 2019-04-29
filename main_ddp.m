@@ -42,10 +42,10 @@ target_state_full = arc_initial_states(:,end);
 
 ode_opts = odeset('RelTol',1e-13,'AbsTol',1e-17);
 
-X_hist_ig_flight = [];
-thrust_hist_ig_flight = [];
-u_hist_ig_flight = [];
-t_hist_ig_flight = [];
+X_hist_ig_flight = [arc_initial_states(:,1)'];
+thrust_hist_ig_flight = [max_thrust_mag*FU*1000*1000*arc_initial_states(8:end,1)'];
+u_hist_ig_flight = [arc_initial_states(8:end,1)'];
+t_hist_ig_flight = [0];
 t_last = 0;
 
 fprintf("Simulating converged trajectory...")
@@ -60,13 +60,13 @@ for i = 1:N_ms-1
     t_last = t_hist_arc(end);
     
     % Go back through and compute control history
-    for j = 1:length(t_hist_arc)
+    for j = 2:length(t_hist_arc)
         thrust_hist_ig_flight = [thrust_hist_ig_flight; max_thrust_mag*FU*1000*1000*X_hist_arc(j,8:end)];
         u_hist_ig_flight = [u_hist_ig_flight; X_hist_arc(j,8:end)];
     end
     % Save total state history
-    X_hist_ig_flight = [X_hist_ig_flight; X_hist_arc];
-    t_hist_ig_flight = [t_hist_ig_flight; t_hist_arc];
+    X_hist_ig_flight = [X_hist_ig_flight; X_hist_arc(2:end,:)];
+    t_hist_ig_flight = [t_hist_ig_flight; t_hist_arc(2:end)];
 end
 % [t_hist_targ_orb, X_hist_targ_orb] = ode113(@(t,X) CR3BP_cart_control(t,X,mu_SE,exh_vel,max_thrust_mag), [0+t_last, T_L2+t_last], [arc_initial_states(1:7,end); zeros(3,1)], ode_opts);
 % for i = 1:length(t_hist_targ_orb)
@@ -129,7 +129,7 @@ opt_epsilon = 1e-7; % acceptance bound for expected reduction
 feas_epsilon = 1e-7;
 
 % Penalty weight
-penalty_sigma = 10; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
+penalty_sigma = 1000000; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
 
 % TRQP parameters
 k_sigma = 1.1;
@@ -139,7 +139,7 @@ delta_TRQP_min = 5e-20;
 delta_TRQP_max = 1;
 
 % Gain guard parameters
-eta1 = 5;
+eta1 = 10;
 eta2 = 1000;
 
 % Number of stages/phases
@@ -182,9 +182,7 @@ else
         u_stage_ig = arc_initial_states(8:end,:);
     else
         stage_times = linspace(0,t_hist_ig_flight(end),n_stages);
-        [t_hist_ig_flight_u, unique_indices] = unique(t_hist_ig_flight);
-        u_hist_ig_flight_u = u_hist_ig_flight(unique_indices,:);
-        u_stage_ig = interp1(t_hist_ig_flight_u,u_hist_ig_flight_u,stage_times,'linear');        
+        u_stage_ig = interp1(t_hist_ig_flight,u_hist_ig_flight,stage_times,'linear');        
         u_stage_ig = u_stage_ig';
     end
 end

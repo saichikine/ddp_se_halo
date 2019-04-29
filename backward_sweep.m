@@ -110,7 +110,7 @@ function traj = backward_sweep(traj)
         % Otherwise proceed as normal
         u_predicted = traj.stage{k}.nominal_u + A;
         if norm(u_predicted) > 1
-            fprintf("Backward sweep: predicted control larger than allowable at stage %i, ratio is %d.\n",k,norm(u_predicted)/1);
+            %fprintf("Backward sweep: predicted control larger than allowable at stage %i, ratio is %d.\n",k,norm(u_predicted)/1);
             u_cap = u_predicted/norm(u_predicted);
             A = u_cap - traj.stage{k}.nominal_u;
             B = zeros(nu, nx);
