@@ -52,3 +52,36 @@ for i = 1:n
         test2(i,j) = term;
     end
 end
+
+%%
+
+res1 = zeros(size(ten));
+temp = zeros(size(ten));
+
+tic
+for i = 1:n
+    temp(i,:,:) = mat1'*squeeze(ten(i,:,:))*mat1;
+end
+for i = 1:n
+    res1(:,:,i) = mat2*ten(:,:,i) + temp(:,:,i);
+end
+toc
+
+res2 = zeros(size(ten));
+tic
+for i = 1:n
+    for j = 1:n
+        for k = 1:n
+            comp1 = 0;
+            comp2 = 0;
+            for gam1 = 1:n
+                comp1 = comp1 + mat2(i,gam1)*ten(gam1,j,k); % matrix part
+                for gam2 = 1:n
+                    comp2 = comp2 + ten(i,gam1,gam2)*mat1(gam1,j)*mat1(gam2,k); % tensor part
+                end
+            end
+            res2(i,j,k) = comp1 + comp2;
+        end
+    end
+end
+toc

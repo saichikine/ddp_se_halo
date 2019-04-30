@@ -129,7 +129,7 @@ opt_epsilon = 1e-7; % acceptance bound for expected reduction
 feas_epsilon = 1e-7;
 
 % Penalty weight
-penalty_sigma = 1000000; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
+penalty_sigma = 100; % scaling parameter for quadratic penalty term, Lantoine uses 0.001
 
 % TRQP parameters
 k_sigma = 1.1;
@@ -394,20 +394,20 @@ while ~bool_converged
     
     % Penalty update (Lantoine step 6)
     % Updating penalty weight seems to break algorithm
-%     if fnew > traj.f_nom
-%         %traj.penalty_sigma = max([min([abs(0.5*hnew/fnew^2),k_sigma*penalty_sigma]),penalty_sigma]); % Lantoine eq. 57
-%         traj.penalty_sigma = max([min([abs(0.5*hnew/fnew^2),k_sigma*traj.penalty_sigma]),traj.penalty_sigma]);
-%         fprintf("Updating penalty sigma to %d.\n",traj.penalty_sigma)
-%     end
+    if fnew > traj.f_nom
+        %traj.penalty_sigma = max([min([abs(0.5*hnew/fnew^2),k_sigma*penalty_sigma]),penalty_sigma]); % Lantoine eq. 57
+        traj.penalty_sigma = max([min([abs(0.5*hnew/fnew^2),k_sigma*traj.penalty_sigma]),traj.penalty_sigma]);
+        fprintf("Updating penalty sigma to %d.\n",traj.penalty_sigma)
+    end
     
     % Nominal update (Lantoine step 7)
     %if ~bool_converged
         traj.nominal_lambda = traj.nominal_lambda + traj.deltal;
         traj.lambda = traj.nominal_lambda;
         traj.w = traj.w + traj.deltaw;
-        traj.J_nom = Jnew;
-        traj.h_nom = hnew;
-        traj.f_nom = fnew;
+        traj.J_nom = traj.compute_J(traj);
+        traj.h_nom = traj.compute_h(traj);
+        traj.f_nom = traj.compute_f(traj);
         Jdata = [Jdata; traj.J_nom];
         fdata = [fdata; traj.f_nom];
     %end
