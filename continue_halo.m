@@ -8,9 +8,9 @@ function target_info = continue_halo(Az_km_old, tau, cont_scale_fac, target_stat
     
     p = inputParser;
     valid_scalar_pos_num = @(x) isnumeric(x) && isscalar(x) && (x>0);
-    valid_ICs = @(x) all(size(initial_guess_ICs==[6 1]));
+    valid_ICs = @(x) all(size(x)==[6 1]);
     valid_f_handle = @(x) isa(x, 'function_handle');
-    valid_bool = @(x) isboolean(x);
+    valid_bool = @(x) isa(x,'logical');
     valid_int = @(x) mod(x,1)==0;
     valid_text = @(x) isstring(x) || ischar(x);
     
@@ -22,7 +22,7 @@ function target_info = continue_halo(Az_km_old, tau, cont_scale_fac, target_stat
     addRequired(p,'mu',valid_scalar_pos_num);
     addRequired(p,'LU',valid_scalar_pos_num);
     addRequired(p,'L_point_string',valid_text);
-    addRequired(P,'halo_pole',valid_text);
+    addRequired(p,'halo_pole',valid_text);
     
     % Optional input parameters
     default_bool_plot = false;
@@ -50,13 +50,13 @@ function target_info = continue_halo(Az_km_old, tau, cont_scale_fac, target_stat
     
     old_orbit = halo_computeplot(mu, Az_km_old, LU, L_point_string, halo_pole,0);
     
-    Az_km_new = Az*cont_scale_fac; % scale Az by desired scaling factor Aznew = Azold*(1+epsilon)
+    Az_km_new = Az_km_old*cont_scale_fac; % scale Az by desired scaling factor Aznew = Azold*(1+epsilon)
     
-    new_orbit = halo_computeplot(mu, Az_km_old, LU, L_point_string, halo_pole,0);
+    new_orbit = halo_computeplot(mu,Az_km_new,LU,L_point_string,halo_pole,0);
     
     %% Integrate both orbits to their target state
     
-    ode_opts = odeset('RelTol',1e-14,'AbsTol',1e-19);
+    ode_opts = odeset('RelTol',1e-13,'AbsTol',1e-19);
     [t_old, x_old] = ode113(@(t,X) CR3BP(t,X,mu), [0, tau], old_orbit{1}, ode_opts);
     
     tau_new = tau/old_orbit{2}*new_orbit{2}; % new time along new orbit is proportional to old time along old orbit
@@ -72,12 +72,14 @@ function target_info = continue_halo(Az_km_old, tau, cont_scale_fac, target_stat
         addToolbarExplorationButtons(gcf)
         hold on
         scatter3((1-mu)*LU, 0, 0,'x','DisplayName', 'Earth');
-        scatter3(L_points(1,1)*LU, L_points(2,1)*LU, 0, 70, 'bd', 'filled', 'DisplayName', '$$L_1$$');
+        %scatter3(L_points(1,1)*LU, L_points(2,1)*LU, 0, 70, 'bd', 'filled', 'DisplayName', '$$L_1$$');
         scatter3(L_points(1,2)*LU, L_points(2,2)*LU, 0, 70, 'rd', 'filled', 'DisplayName', '$$L_2$$');
-        plot3(x_old(:,1)*LU, x_old(:,2)*LU, x_old(:,3)*LU, 'b-','DisplayName', 'Old Halo Orbit'); hold on
-        plot3(x_old(1,1)*LU, x_old(1,2)*LU, x_old(1,3)*LU, 'ok', 'markerfacecolor', 'y', 'DisplayName', 'Old Halo Initial Point'); hold on
-        plot3(x_new(:,1)*LU, x_new(:,2)*LU, x_new(:,3)*LU, 'r-','DisplayName', 'New Halo Orbit'); hold on
-        plot3(x_new(1,1)*LU, x_new(1,2)*LU, x_new(1,3)*LU, 'ok', 'markerfacecolor', 'y', 'DisplayName', 'New Halo Initial Point'); hold on
+        plot3(x_old(:,1)*LU, x_old(:,2)*LU, x_old(:,3)*LU, '-','color',[59 119 8]./255,'DisplayName', 'Old Halo Orbit');
+        plot3(x_old(1,1)*LU, x_old(1,2)*LU, x_old(1,3)*LU, 'ok', 'markerfacecolor', [59 119 8]./255, 'DisplayName', 'Old Halo Initial Point');
+        plot3(x_old(end,1)*LU, x_old(end,2)*LU, x_old(end,3)*LU, 'dk', 'markerfacecolor', [59 119 8]./255, 'DisplayName', 'Old Target');
+        plot3(x_new(:,1)*LU, x_new(:,2)*LU, x_new(:,3)*LU, 'm-','DisplayName', 'New Halo Orbit');
+        plot3(x_new(1,1)*LU, x_new(1,2)*LU, x_new(1,3)*LU, 'ok', 'markerfacecolor', 'm', 'DisplayName', 'New Halo Initial Point');
+        plot3(x_new(end,1)*LU, x_new(end,2)*LU, x_new(end,3)*LU, 'dk', 'markerfacecolor', 'm', 'DisplayName', 'New Target');
         hold off
         grid on
         h = get(gca,'DataAspectRatio');
