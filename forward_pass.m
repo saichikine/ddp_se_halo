@@ -51,7 +51,7 @@ function traj = forward_pass(traj)
         traj.stage{k}.u = u_current;
         
         % Integrate 
-        [~, x_stage] = ode113(@(t,X) CR3BP_cart_control(t,X,traj.mu,traj.exh_vel,traj.max_thrust_mag), [stage_times(k) stage_times(k+1)], [state_current; u_current], ode_opts);
+        [~, x_stage] = ode113(@(t,X) CR3BP_cart_control_mex(t,X,traj.mu,traj.exh_vel,traj.max_thrust_mag), [stage_times(k) stage_times(k+1)], [state_current; u_current], ode_opts);
         
         % Update current state and save
         state_current = x_stage(end,1:7)';

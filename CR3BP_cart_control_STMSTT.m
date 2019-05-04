@@ -1,4 +1,5 @@
 function Xdot = CR3BP_cart_control_STMSTT(t,X,mu,c,Tmax)
+%#codegen
     
     %% Unpack
     x = X(1);

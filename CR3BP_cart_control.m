@@ -1,5 +1,6 @@
 function Xdot = CR3BP_cart_control(t,X,mu,c,Tmax)
-    
+%#codegen
+
     %% Unpack
     x = X(1);
     y = X(2);
@@ -12,7 +13,7 @@ function Xdot = CR3BP_cart_control(t,X,mu,c,Tmax)
     uy = X(9);
     uz = X(10);
     
-    STM = reshape(X(11:end),10,[]);
+%     STM = reshape(X(11:end),10,[]);
     
     %% Dynamics
     
@@ -26,10 +27,10 @@ function Xdot = CR3BP_cart_control(t,X,mu,c,Tmax)
     mdot = -Tmax*sqrt(ux^2 + uy^2 + uz^2 + u_epsilon(1))/c;
     
     %% STM Dynamics
-    fXmat = fX(X,c,mu,Tmax);
-    STMdot = fXmat*STM;
+%     fXmat = fX(X,c,mu,Tmax);
+%     STMdot = fXmat*STM;
     
     %% Repack
-    Xdot = [xdot; ydot; zdot; xddot; yddot; zddot; mdot; 0; 0; 0; reshape(STMdot,[],1)];
+    Xdot = [xdot; ydot; zdot; xddot; yddot; zddot; mdot; 0; 0; 0;];% reshape(STMdot,[],1)];
     
 end

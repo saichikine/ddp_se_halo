@@ -1,4 +1,7 @@
 function fX = fX(X, c, mu, Tmax)
+
+    fX = NaN(10,10);
+
 	x = X(1);
  	y = X(2);
  	z = X(3);

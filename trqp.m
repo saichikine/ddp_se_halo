@@ -1,4 +1,5 @@
 function [s_out, H_out, bool_TRQP_failure] = trqp(H, g, delta, M)
+%#codegen
 
     max_iter = 100;
     counter = 0;

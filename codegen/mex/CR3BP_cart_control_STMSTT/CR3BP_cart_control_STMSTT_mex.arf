@@ -1,0 +1,11 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:mexfilerequiredapiversion
+/export:emlrtMexFcnProperties
+/export:CR3BP_cart_control_STMSTT
+/export:CR3BP_cart_control_STMSTT_initialize
+/export:CR3BP_cart_control_STMSTT_terminate
+/export:CR3BP_cart_control_STMSTT_atexit

@@ -54,7 +54,7 @@ function traj = compute_STMs_ser(traj)
     % Based on precomputed trajectory, compute STMs and STTs in parallel
     parfor k = 1:traj.num_stages-1
         X0 = [reshape(states_post(:,k),[],1); controls(:,k); reshape(STM_0,[],1); reshape(STT_0,[],1)];
-        [~,stage_full_states] = ode113(@(t,X) CR3BP_cart_control_STMSTT(t,X,mu,exh_vel,max_thrust), [times(k) times(k+1)], X0, ode_opts);
+        [~,stage_full_states] = ode113(@(t,X) CR3BP_cart_control_STMSTT_mex(t,X,mu,exh_vel,max_thrust), [times(k) times(k+1)], X0, ode_opts);
         STMs_post(:,:,k) = reshape(stage_full_states(end,nX+1:nX+nX^2),nX,nX);
         STTs_post(:,:,:,k) = reshape(stage_full_states(end,nX+nX^2+1:end),[nX nX nX]);
     end
