@@ -1,0 +1,11 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:mexfilerequiredapiversion
+/export:emlrtMexFcnProperties
+/export:trqp_multipliers
+/export:trqp_multipliers_initialize
+/export:trqp_multipliers_terminate
+/export:trqp_multipliers_atexit

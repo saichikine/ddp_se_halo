@@ -46,7 +46,7 @@ function traj = compute_STMs_ser(traj)
     for k = 1:traj.num_stages-1
 %         current_state = states(:,k);
         X0 = [reshape(current_state,[],1); controls(:,k)]; % initial state (stage k)
-        [~,stage_full_states] = ode113(@(t,X) CR3BP_cart_control(t,X,mu,exh_vel,max_thrust), [times(k) times(k+1)], X0, ode_opts); % prop to k+1
+        [~,stage_full_states] = ode113(@(t,X) CR3BP_cart_control_mex(t,X,mu,exh_vel,max_thrust), [times(k) times(k+1)], X0, ode_opts); % prop to k+1
         current_state = stage_full_states(end,1:traj.nx)';
         states_post(:,k+1) = current_state;
     end
