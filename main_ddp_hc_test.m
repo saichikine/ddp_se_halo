@@ -22,8 +22,8 @@ load('Az_start.mat');
 new_targ = continue_halo(Az_L2,tau,1.01,target_state_posvel,mu_SE,LU,"L2","north",'bool_plot',true);
 
 %% 
-traj.penalty_sigma = 1000;
-traj.delta_TRQP = delta_TRQP_default;
+traj.penalty_sigma = 5000;
+traj.delta_TRQP = delta_TRQP_default/1000;
 
 traj.compute_constraintvec = @(traj) constraint_vec(traj,new_targ.target_state);
 % stage_times = linspace(0,new_targ.tau,n_stages);
