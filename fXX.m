@@ -1,6 +1,6 @@
 function fXX = fXX(X, c, mu, Tmax)
 
-    fXX = NaN([10 10 10]);
+	fXX = NaN([10 10 10]);
 
 	x = X(1);
  	y = X(2);

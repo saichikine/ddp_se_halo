@@ -32,7 +32,8 @@ f = [xdot ydot zdot xddot yddot zddot mdot 0 0 0];
 fX_sym = jacobian(f, state); % equivalent to looping through i and j and doing diff(f(i),state(j)) (verified)
 
 fidfX = fopen('fX.m','w');
-fprintf(fidfX,'function fX = fX(X, c, mu, Tmax)\n');
+fprintf(fidfX,'function fX = fX(X, c, mu, Tmax)\n\n');
+fprintf(fidfX,'\tfX = NaN(10,10);\n\n');
 fprintf(fidfX,'\tx = X(1);\n \ty = X(2);\n \tz = X(3);\n \txdot = X(4);\n \tydot = X(5);\n \tzdot = X(6);\n \tm = X(7);\n \tux = X(8);\n \tuy = X(9);\n \tuz = X(10);\n\n');
 for i = 1:nX
    for j = 1:nX
@@ -64,8 +65,9 @@ end
 %% Write elements of fXX to file
 
 fidfXX = fopen('fXX.m','w');
-fprintf(fidfXX,'function fXX = fXX(X, c, mu, Tmax)\n');
-fprintf(fidfX,'\tx = X(1);\n \ty = X(2);\n \tz = X(3);\n \txdot = X(4);\n \tydot = X(5);\n \tzdot = X(6);\n \tm = X(7);\n \tux = X(8);\n \tuy = X(9);\n \tuz = X(10);\n\n');
+fprintf(fidfXX,'function fXX = fXX(X, c, mu, Tmax)\n\n');
+fprintf(fidfXX,'\tfXX = NaN([10 10 10]);\n\n');
+fprintf(fidfXX,'\tx = X(1);\n \ty = X(2);\n \tz = X(3);\n \txdot = X(4);\n \tydot = X(5);\n \tzdot = X(6);\n \tm = X(7);\n \tux = X(8);\n \tuy = X(9);\n \tuz = X(10);\n\n');
 for i = 1:nX
     for j = 1:nX
         for k = 1:nX

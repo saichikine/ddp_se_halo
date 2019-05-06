@@ -91,7 +91,7 @@ function traj = backward_sweep(traj)
         % TRQP
         feedback_scaling_matrix = 1/traj.max_thrust_mag^2.*eye(3);
         feedback_scaling_matrix = eye(3);
-        [A, Juu_t, bool_TRQP_failure] = trqp_control_mex(Juu,Ju,traj.delta_TRQP,feedback_scaling_matrix);
+        [A, Juu_t, bool_TRQP_failure] = trqp(Juu,Ju,traj.delta_TRQP,feedback_scaling_matrix);
         if bool_TRQP_failure
             traj.bool_TRQP_failure = true; % Lets outer DDP loop know TRQP failed
             warning("TRQP failed at " + part_string + ", stage %i.",k);
@@ -271,7 +271,7 @@ function traj = backward_sweep(traj)
     % TRQP for multiplier
     % Jll should be negative def, so use -Jll and -Jl
     part_string = "multiplier update";
-    [Alp,Jlplp_t,bool_TRQP_failure] = trqp_multipliers_mex(-Jlplp,-Jlp,traj.delta_TRQP,eye(length(Jlp)));
+    [Alp,Jlplp_t,bool_TRQP_failure] = trqp(-Jlplp,-Jlp,traj.delta_TRQP,eye(length(Jlp)));
     if bool_TRQP_failure
         traj.bool_TRQP_failure = true;
         warning("TRQP failed at " + part_string + ".");

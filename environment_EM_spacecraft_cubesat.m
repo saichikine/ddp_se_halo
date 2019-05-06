@@ -41,7 +41,7 @@ g0 = 9.80665; % [m/s^2] g0 for Isp
 % 6U cubesat (from ians paper)
 cubesat = spacecraft;
 cubesat.mass = 200;%14; % [kg]
-cubesat.max_thrust = 1.5;%0.4; % [mN]
+cubesat.max_thrust = 150;%0.4; % [mN]
 cubesat.Isp = 2551;%1250; % [s]
 cubesat.Ve = cubesat.Isp*g0; % [m/s]
 
