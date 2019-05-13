@@ -138,12 +138,12 @@ traj.opt_epsilon = 1e-10; % stop condition for expected reduction
 traj.feas_epsilon = 1e-7; % stop condition for endpoint constraint
 
 % Penalty weight
-traj.penalty_sigma = 1e1; % scaling parameter for quadratic penalty term
+traj.penalty_sigma = 1e2; % scaling parameter for quadratic penalty term
 
 % TRQP parameters
 traj.k_sigma = 1.1;
 traj.kappa = 0.1; 
-delta_TRQP_default = 1e-4;
+delta_TRQP_default = 1e-1;
 traj.delta_TRQP_min = 5e-18;
 traj.delta_TRQP_max = 1;
 traj.delta_TRQP = delta_TRQP_default;
