@@ -10,8 +10,10 @@ function [fig_traj, fig_control] = ddp_traj_plot(traj)
     x_L2 = L_points(1,2);
 
     u = NaN(traj.nu,traj.num_stages);
+    u_mag = NaN(1,traj.num_stages);
     for k = 1:traj.num_stages
         u(:,k) = traj.max_thrust_mag*FU*1000*1000.*(traj.stage{k}.nominal_u);%-traj.stage{k}.nominal_u); % FU is in kN; multiply by FU to get kN, then convert to mN
+        u_mag(k) = norm(u(:,k));
         %fprintf("u diff at stage %i is:\n %d\n%d\n%d\n",k,u(1,k),u(2,k),u(3,k));
     end
 
@@ -45,6 +47,15 @@ function [fig_traj, fig_control] = ddp_traj_plot(traj)
     legend()
     title('Control History')
     ylabel('Thrust [mN]')
+    xlabel('Time [days]')
+    
+    fig_control_mag = figure;
+    addToolbarExplorationButtons(fig_control_mag)
+    plot(traj.stage_times(1:traj.num_stages).*TU/60/60/24, u_mag, '-o','DisplayName','Thrust Magnitude');
+    grid on
+    legend()
+    title('Control Magnitude History')
+    ylabel('Thrust Magnitude [mN]')
     xlabel('Time [days]')
     
 end

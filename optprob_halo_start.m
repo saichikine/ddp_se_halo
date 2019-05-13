@@ -21,7 +21,7 @@ addpath(genpath(pwd));
 load('environment_SE_spacecraft_cubesat.mat'); % m_sc, exh_vel, and max_thrust_mag are already normalized and loaded here
 fprintf('Loaded spacecraft and environment.\n')
 disp(cubesat);
-load('halo_trans_ig_100_b.mat'); % initial guess for LT transfer from multiple-shooting
+load('halo_trans_ig_100_good.mat'); % initial guess for LT transfer from multiple-shooting
 fprintf('Loaded initial guess.\n');
 
 %% Plot initial guess
@@ -101,16 +101,16 @@ for i = 1:size(arc_initial_states,2)
     %plot3(arc_initial_states(1,i), arc_initial_states(2,i), arc_initial_states(3,i), 'o', 'DisplayName', node_string); hold on
 end
 %plot(X_hist_total_guess(1,1), X_hist_total_guess(1,2), X_hist_total_guess(1,3), 'ok', 'markerfacecolor',[244,179,66]./255, 'DisplayName', 'Initial Point'); hold on
-scatter3(initial_state_full(1), initial_state_full(2), initial_state_full(3), 'x', 'DisplayName', 'Initial Position');
-scatter3(target_state_full(1), target_state_full(2), target_state_full(3), 'x', 'DisplayName', 'Target Position');
-scatter3(X_hist_ig_flight(:,1), X_hist_ig_flight(:,2), X_hist_ig_flight(:,3), 'r.','DisplayName', 'Low-Thrust Transfer Trajectory'); hold on
-quiver3(X_hist_ig_flight(:,1),X_hist_ig_flight(:,2),X_hist_ig_flight(:,3),thrust_hist_ig_flight(:,1),thrust_hist_ig_flight(:,2),thrust_hist_ig_flight(:,3), 1.1,'DisplayName', 'Thrust Vectors'); hold on
-title('Final Low-Thrust Transfer')
+scatter3(initial_state_full(1), initial_state_full(2), initial_state_full(3), 50, 'o', 'filled', 'DisplayName', 'Initial Position');
+scatter3(target_state_full(1), target_state_full(2), target_state_full(3), 50, 'o', 'filled', 'DisplayName', 'Target Position');
+scatter3(X_hist_ig_flight(:,1), X_hist_ig_flight(:,2), X_hist_ig_flight(:,3), '.','DisplayName', 'Low-Thrust Transfer Trajectory'); hold on
+quiver3(X_hist_ig_flight(:,1),X_hist_ig_flight(:,2),X_hist_ig_flight(:,3),thrust_hist_ig_flight(:,1),thrust_hist_ig_flight(:,2),thrust_hist_ig_flight(:,3), 2,'DisplayName', 'Thrust Vectors'); hold on
+%title('Multiple Shooting Low-Thrust Transfer')
 xlabel('x')
 ylabel('y')
 zlabel('z')
 grid on;
-%legend();
+legend();
 h = get(gca,'DataAspectRatio');
 if h(3)==1
       set(gca,'DataAspectRatio',[1 1 1])
@@ -190,7 +190,7 @@ target_state_posvel = target_state_full(1:6);
 %% Get initial guess from multiple shooting and finish DDP setup
 
 % Stage times
-time_spacing_nonlinear_flag = 0;
+time_spacing_nonlinear_flag = 1;
 if time_spacing_nonlinear_flag
     stage_time_indices = floor(linspace(1,length(t_hist_ig_flight),traj.num_stages));
     stage_times = t_hist_ig_flight(stage_time_indices); % spacing based on ode output
