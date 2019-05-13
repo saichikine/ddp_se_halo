@@ -129,8 +129,8 @@ addToolbarExplorationButtons(gcf)
 scatter(x_L1, 0, 'rd', 'DisplayName','L1'); hold on
 scatter(x_L2, 0, 'bd', 'DisplayName','L2');
 plot(1-mu_SE, 0, 'ok', 'markerfacecolor', 'b', 'markersize', 10, 'DisplayName', 'Earth'); hold on % Smaller primary
-scatter(initial_state(1), initial_state(2), 'co','filled','DisplayName','Initial State');
-scatter(target_state_posvel(1), target_state_posvel(2), 'mo','filled','DisplayName', 'Target State');
+scatter(initial_state(1), initial_state(2), 150,'o','filled','MarkerFaceColor', [51, 119, 8]./255,'DisplayName','Initial State');
+scatter(target_state_posvel(1), target_state_posvel(2),125,'mo','filled','DisplayName', 'Target State');
 plot(states(1,:), states(2,:), '-o', 'DisplayName','Trajectory');
 quiver(states(1,:), states(2,:), u(1,:), u(2,:), 1.1, 'DisplayName', 'Thrust Vectors');
 hold off

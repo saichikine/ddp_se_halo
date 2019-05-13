@@ -31,6 +31,7 @@ function [s_out, H_out, bool_TRQP_failure] = trqp(H, g, delta, M)
         H_out = eye(size(H_in))*1e16;
         s_out = zeros(size(g));
         warning('H blew up in TRQP');
+        bool_TRQP_failure = true;
         return
     end
 
@@ -51,8 +52,13 @@ function [s_out, H_out, bool_TRQP_failure] = trqp(H, g, delta, M)
     end % zero eigenvalue
 
     H_tilde = H + lambda_p*eye(size(H));
-
-    L = chol(H_tilde,'lower');
+    
+    try
+        L = chol(H_tilde,'lower');
+    catch
+        bool_TRQP_failure = true;
+        return
+    end
     s = -(L*L')\g;
 
     % Step 3

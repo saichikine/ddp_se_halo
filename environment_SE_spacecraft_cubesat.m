@@ -55,7 +55,7 @@ VU = DU/TU; % [km/s]
 AU = DU/TU^2; % [km/s^2]
 MU = cubesat.mass; % [kg]
 FU = MU*DU/TU^2; % [kg*km/s^2] = [kN]
-normalizers = struct('time_norm',TU,'vel_norm',VU,'accel_norm',AU,'force_norm',FU','m_norm',MU);
+normalizers = struct('TU',TU,'VU',VU,'AU',AU,'FU',FU','MU',MU);
 
 % Normalize quantities of interest
 m_sc = cubesat.mass/MU;

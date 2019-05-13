@@ -19,8 +19,9 @@ load('Az_start.mat');
 
 %% Get new target state
 
-new_targ = continue_halo(Az_L2,tau,1.01,target_state_posvel,mu_SE,LU,"L2","north",'bool_plot',true);
-
+tic
+new_targ = continue_halo_fast(Az_L2,tau,1.01,target_state_posvel,mu_SE,LU,"L2","north",'bool_plot',true);
+toc
 %% 
 traj.penalty_sigma = 5000;
 traj.delta_TRQP = delta_TRQP_default/1000;

@@ -57,10 +57,10 @@ function target_info = continue_halo(Az_km_old, tau, cont_scale_fac, target_stat
     %% Integrate both orbits to their target state
     
     ode_opts = odeset('RelTol',1e-13,'AbsTol',1e-19);
-    [t_old, x_old] = ode113(@(t,X) CR3BP(t,X,mu), [0, tau], old_orbit{1}, ode_opts);
+    [t_old, x_old] = ode113(@(t,X) CR3BP_fast_mex(t,X,mu), [0, tau], old_orbit{1}, ode_opts);
     
     tau_new = tau/old_orbit{2}*new_orbit{2}; % new time along new orbit is proportional to old time along old orbit
-    [t_new, x_new] = ode113(@(t,X) CR3BP(t,X,mu), [0, tau_new], new_orbit{1}, ode_opts);
+    [t_new, x_new] = ode113(@(t,X) CR3BP_fast_mex(t,X,mu), [0, tau_new], new_orbit{1}, ode_opts);
       
     %% Plot if desired
     
