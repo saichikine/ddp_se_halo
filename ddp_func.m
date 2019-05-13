@@ -217,10 +217,10 @@ function final_traj_info = ddp_func(initial_traj,varargin)
         end
     end
     stop_condition = 0;
-    toc(DDP_start)
+    DDP_time = toc(DDP_start)
     
     %% Assign outputs
     final_traj = traj;
     final_traj_info = struct('traj',final_traj,'f_hist',f_hist,'J_hist',J_hist,'sigma_hist',sigma_hist,'delta_hist',delta_hist,...
-        'rho_hist',rho_hist,'lambda_hist',lambda_hist,'mass_hist',mass_hist,'stop_condition',stop_condition);
+        'rho_hist',rho_hist,'lambda_hist',lambda_hist,'mass_hist',mass_hist,'stop_condition',stop_condition,'time',DDP_time);
 end
