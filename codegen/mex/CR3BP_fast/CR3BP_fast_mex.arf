@@ -1,0 +1,11 @@
+libemlrt.lib
+libcovrt.lib
+libut.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:mexfilerequiredapiversion
+/export:emlrtMexFcnProperties
+/export:CR3BP_fast
+/export:CR3BP_fast_initialize
+/export:CR3BP_fast_terminate
+/export:CR3BP_fast_atexit

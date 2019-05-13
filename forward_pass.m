@@ -5,7 +5,7 @@ function traj = forward_pass(traj)
     
     %%   
     n_stages = length(traj.stage);
-    ode_opts = odeset('RelTol',1e-13,'AbsTol',1e-18);
+    ode_opts = odeset('RelTol',1e-13,'AbsTol',1e-17);
     
     %% Unpack parameter and multiplier updates (computed at end of backward sweep)
     deltal = traj.deltal;

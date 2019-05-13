@@ -40,9 +40,9 @@ g0 = 9.80665; % [m/s^2] g0 for Isp
 
 % 6U cubesat (from ians paper)
 cubesat = spacecraft;
-cubesat.mass = 200;%14; % [kg]
-cubesat.max_thrust = 150;%0.4; % [mN]
-cubesat.Isp = 2551;%1250; % [s]
+cubesat.mass = 14; % [kg]
+cubesat.max_thrust = 0.4; % [mN]
+cubesat.Isp = 1250;%2551;%1250; % [s]
 cubesat.Ve = cubesat.Isp*g0; % [m/s]
 
 %%
@@ -55,7 +55,7 @@ VU = DU/TU; % [km/s]
 AU = DU/TU^2; % [km/s^2]
 MU = cubesat.mass; % [kg]
 FU = MU*DU/TU^2; % [kg*km/s^2] = [kN]
-normalizers = struct('time_norm',TU,'vel_norm',VU,'accel_norm',AU,'force_norm',FU','m_norm',MU);
+normalizers = struct('TU',TU,'VU',VU,'AU',AU,'FU',FU','MU',MU);
 
 % Normalize quantities of interest
 m_sc = cubesat.mass/MU;

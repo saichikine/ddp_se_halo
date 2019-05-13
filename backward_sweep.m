@@ -131,7 +131,7 @@ function traj = backward_sweep(traj)
             D = -Juu_inv*Jul;
 
             % Safeguard for B 
-            %B = traj.eta1*norm(A)/max([traj.eta1*norm(A), norm(B*traj.stage{k}.deltax_prev)])*B;
+            B = traj.eta1*norm(A)/max([traj.eta1*norm(A), norm(B*traj.stage{k}.deltax_prev)])*B;
         end
         
 %         A = 0*A;

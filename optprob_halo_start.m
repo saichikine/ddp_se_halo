@@ -134,7 +134,7 @@ traj.target_state = target_state_posvel;
 
 % Acceptance bounds
 traj.iterate_epsilon = 0.1; % acceptance bound for each iteration, rho must be within this of 1
-traj.opt_epsilon = 1e-10; % stop condition for expected reduction
+traj.opt_epsilon = 1e-9; % stop condition for expected reduction
 traj.feas_epsilon = 1e-7; % stop condition for endpoint constraint
 
 % Penalty weight
@@ -143,7 +143,7 @@ traj.penalty_sigma = 1e2; % scaling parameter for quadratic penalty term
 % TRQP parameters
 traj.k_sigma = 1.1;
 traj.kappa = 0.1; 
-delta_TRQP_default = 1e-1;
+delta_TRQP_default = 1e-3;
 traj.delta_TRQP_min = 5e-18;
 traj.delta_TRQP_max = 1;
 traj.delta_TRQP = delta_TRQP_default;
