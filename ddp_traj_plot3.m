@@ -1,4 +1,4 @@
-function [fig_traj, fig_control] = ddp_traj_plot3(traj)
+function [fig_traj, fig_control, fig_control_mag] = ddp_traj_plot3(traj)
 
     TU = traj.normalizers.TU;
     FU = traj.normalizers.FU;

@@ -21,7 +21,7 @@ addpath(genpath(pwd));
 load('environment_SE_spacecraft_cubesat.mat'); % m_sc, exh_vel, and max_thrust_mag are already normalized and loaded here
 fprintf('Loaded spacecraft and environment.\n')
 disp(cubesat);
-load('halo_trans_ig_100_good.mat'); % initial guess for LT transfer from multiple-shooting
+load('halo_trans_ig_100_b.mat'); % initial guess for LT transfer from multiple-shooting
 fprintf('Loaded initial guess.\n');
 
 %% Plot initial guess
@@ -259,3 +259,4 @@ ddp_halo1 = ddp_func(traj,'max_iters',3000,'bool_liveplot',true);
 %% Plot final results
 
 ddp_traj_plot3(ddp_halo1.traj);
+ddp_conv_plot(ddp_halo1);
