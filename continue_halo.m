@@ -73,7 +73,7 @@ function target_info = continue_halo(Az_km_old, tau, cont_scale_fac, target_stat
         hold on
         %scatter3((1-mu)*LU, 0, 0,'x','DisplayName', 'Earth');
         %scatter3(L_points(1,1)*LU, L_points(2,1)*LU, 0, 70, 'bd', 'filled', 'DisplayName', '$$L_1$$');
-        scatter3(L_points(1,2)*LU, L_points(2,2)*LU, 0, 70, 'rd', 'filled', 'DisplayName', '$$L_2$$');
+        scatter3(L_points(1,2)*LU, L_points(2,2)*LU, 0, 70, 'bd', 'filled', 'DisplayName', '$$L_2$$');
         plot3(x_old(:,1)*LU, x_old(:,2)*LU, x_old(:,3)*LU, '-','color',[59 119 8]./255,'DisplayName', 'Old Halo Orbit');
         plot3(x_old(1,1)*LU, x_old(1,2)*LU, x_old(1,3)*LU, 'ok', 'markerfacecolor', [59 119 8]./255, 'DisplayName', 'Old Halo Initial Point');
         plot3(x_old(end,1)*LU, x_old(end,2)*LU, x_old(end,3)*LU, 'dk', 'markerfacecolor', [59 119 8]./255, 'DisplayName', 'Old Target');

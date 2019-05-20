@@ -15,7 +15,7 @@ addpath(genpath(pwd)); % add all subfolders to path (for this session)
 
 %% Setup
 
-num_transfers = 5;
+num_transfers = 10;
 cont_times = NaN(num_transfers,1);
 
 %% 1st (base) case
@@ -35,14 +35,15 @@ tau_prev = tau;
 
 %%
 total_cont_time_start = tic;
-for trans_num = 6:num_transfers
+for trans_num = 7:num_transfers
     
     cont_start = tic;
     
     new_traj = ddp_conv_traj_prev;
     new_targ = continue_halo_fast(Az_L2,tau,1.01,ddp_conv_traj_prev.target_state,ddp_conv_traj_prev.mu,LU,"L2","north",'bool_plot',false);
+    Az_L2_prev = Az_L2;
     Az_L2 = new_targ.Az;
-    tau = new_targ.tau;
+    tau = new_targ.tau;moon
     
     new_traj.target_state = new_targ.target_state;
     new_traj.penalty_sigma = 1e2;
@@ -57,7 +58,7 @@ for trans_num = 6:num_transfers
     fprintf("Done initializing.\n")
     
     % Safeguard against DDP failure
-    ddp_halo = ddp_func(new_traj,'max_iters',3000,'bool_liveplot',true);
+    ddp_halo = ddp_func(new_traj,'max_iters',6000,'bool_liveplot',true);
     ddp_halo_trans_set{trans_num} = ddp_halo;
     cont_times(trans_num) = toc(cont_start);
     ddp_traj_plot3(ddp_halo.traj);

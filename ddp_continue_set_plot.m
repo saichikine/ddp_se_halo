@@ -1,9 +1,10 @@
-function [fullplot,xyplot,yzplot,xzplot] = ddp_continue_set_plot(continuation_set,num_conts)
+function [fullplot,xyplot,yzplot,xzplot,magplot] = ddp_continue_set_plot(continuation_set,num_conts)
 
     L_points = lagrangePoints(continuation_set{1}.traj.mu); 
     x_L1 = L_points(1,1);
     x_L2 = L_points(1,2);
     FU = continuation_set{1}.traj.normalizers.FU;
+    TU = continuation_set{1}.traj.normalizers.TU;
     
     % 3D plot
     full_plot = figure;
@@ -140,6 +141,33 @@ function [fullplot,xyplot,yzplot,xzplot] = ddp_continue_set_plot(continuation_se
     axis equal
     xlabel('x')
     ylabel('z')
+    set(gcf,'color','w')
+    
+    % Plot with all control magnitude profiles
+    magplot = figure;
+    addToolbarExplorationButtons(magplot)
+    hold on
+    for i = 1:num_conts
+        trans_label_string = "Transfer " + num2str(i);
+        targ_label_string = "Target " + num2str(i);
+        traj = continuation_set{i}.traj;
+        u = NaN(traj.nu,traj.num_stages);
+        u_mag = NaN(1,traj.num_stages);
+        for k = 1:traj.num_stages
+            u(:,k) = traj.max_thrust_mag*FU*1000*1000.*(traj.stage{k}.nominal_u);%-traj.stage{k}.nominal_u); % FU is in kN; multiply by FU to get kN, then convert to mN
+            u_mag(k) = norm(u(:,k));
+            %fprintf("u diff at stage %i is:\n %d\n%d\n%d\n",k,u(1,k),u(2,k),u(3,k));
+        end
+        
+        plot(traj.stage_times(1:traj.num_stages).*TU/60/60/24, u_mag, '-','DisplayName',trans_label_string);
+        
+    end
+    hold off
+    grid on
+    legend()
+    title('Control Magnitude History')
+    ylabel('Thrust Magnitude [mN]')
+    xlabel('Time [days]')
     set(gcf,'color','w')
     
 end

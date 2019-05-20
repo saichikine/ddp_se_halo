@@ -54,9 +54,9 @@ tic
 for i = 1:N_ms-1
       
     if thrust_flags(i) == 0
-        [t_hist_arc,X_hist_arc] = ode113(@(t,X) CR3BP_cart_control(t,X,mu_SE,exh_vel,max_thrust_mag), [0+t_last, arc_integration_times(i)+t_last], [arc_initial_states(1:7,i); zeros(3,1)], ode_opts);
+        [t_hist_arc,X_hist_arc] = ode113(@(t,X) CR3BP_cart_control(t,X,mu_SE,exh_vel,max_thrust_mag), linspace(0+t_last, arc_integration_times(i)+t_last,100), [arc_initial_states(1:7,i); zeros(3,1)], ode_opts);
     else
-        [t_hist_arc,X_hist_arc] = ode113(@(t,X) CR3BP_cart_control(t,X,mu_SE,exh_vel,max_thrust_mag), [0+t_last, arc_integration_times(i)+t_last], arc_initial_states(:,i), ode_opts);
+        [t_hist_arc,X_hist_arc] = ode113(@(t,X) CR3BP_cart_control(t,X,mu_SE,exh_vel,max_thrust_mag), linspace(0+t_last, arc_integration_times(i)+t_last,100), arc_initial_states(:,i), ode_opts);
     end
     t_last = t_hist_arc(end);
     
@@ -91,11 +91,12 @@ ylabel('Control Thrust [$$mN$$]')
 legend()
 grid on
 
+spacing = 20;
 figure
 addToolbarExplorationButtons(gcf) % Adds buttons to figure toolbar
 plot3(1-mu_SE, 0, 0, 'ok', 'markerfacecolor', 'b', 'markersize', 10, 'DisplayName', 'Earth'); hold on % Smaller primary
-plot3(x_L1, 0, 0, 'dk', 'markerfacecolor', 'r', 'DisplayName', '$$L_1$$'); hold on % L1 location
-plot3(x_L2, 0, 0, 'dk' , 'markerfacecolor', 'b', 'DisplayName', '$$L_2$$'); hold on % L2 location
+plot3(x_L1, 0, 0, 'dk', 'markerfacecolor', 'b', 'DisplayName', '$$L_1$$'); hold on % L1 location
+plot3(x_L2, 0, 0, 'dk' , 'markerfacecolor', 'r', 'DisplayName', '$$L_2$$'); hold on % L2 location
 for i = 1:size(arc_initial_states,2)
     node_string = "Node" + num2str(i);
     %plot3(arc_initial_states(1,i), arc_initial_states(2,i), arc_initial_states(3,i), 'o', 'DisplayName', node_string); hold on
@@ -103,8 +104,8 @@ end
 %plot(X_hist_total_guess(1,1), X_hist_total_guess(1,2), X_hist_total_guess(1,3), 'ok', 'markerfacecolor',[244,179,66]./255, 'DisplayName', 'Initial Point'); hold on
 scatter3(initial_state_full(1), initial_state_full(2), initial_state_full(3), 50, 'o', 'filled', 'DisplayName', 'Initial Position');
 scatter3(target_state_full(1), target_state_full(2), target_state_full(3), 50, 'o', 'filled', 'DisplayName', 'Target Position');
-scatter3(X_hist_ig_flight(:,1), X_hist_ig_flight(:,2), X_hist_ig_flight(:,3), '.','DisplayName', 'Low-Thrust Transfer Trajectory'); hold on
-quiver3(X_hist_ig_flight(:,1),X_hist_ig_flight(:,2),X_hist_ig_flight(:,3),thrust_hist_ig_flight(:,1),thrust_hist_ig_flight(:,2),thrust_hist_ig_flight(:,3), 2,'DisplayName', 'Thrust Vectors'); hold on
+plot3(X_hist_ig_flight(:,1), X_hist_ig_flight(:,2), X_hist_ig_flight(:,3), '.-', 'MarkerSize',10,'color',[0,0.4470,0.7410],'DisplayName','Trajectory'); hold on
+quiver3(X_hist_ig_flight(1:spacing:end,1),X_hist_ig_flight(1:spacing:end,2),X_hist_ig_flight(1:spacing:end,3),thrust_hist_ig_flight(1:spacing:end,1),thrust_hist_ig_flight(1:spacing:end,2),thrust_hist_ig_flight(1:spacing:end,3), 1.5, 'Color',[0.8500,0.3250,0.0980],'linewidth',2,'ShowArrowHead','off','DisplayName', 'Thrust Vectors'); hold on
 %title('Multiple Shooting Low-Thrust Transfer')
 xlabel('x')
 ylabel('y')
@@ -259,4 +260,5 @@ ddp_halo1 = ddp_func(traj,'max_iters',3000,'bool_liveplot',true);
 %% Plot final results
 
 ddp_traj_plot3(ddp_halo1.traj);
+ddp_halo_traj_plot3(ddp_halo1.traj)
 ddp_conv_plot(ddp_halo1);
