@@ -83,6 +83,9 @@ for trans_num = 7:num_transfers
 end
 total_cont_time = toc(total_cont_time_start);
 
+%%
+ddp_continue_set_plot(ddp_halo_trans_set,9,'Earth','Sun');
+
 %% Save
 save('continuation_success.mat');
 fprintf("Continuation process successful!");

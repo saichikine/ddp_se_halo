@@ -67,31 +67,28 @@ function target_info = continue_halo(Az_km_old, tau, cont_scale_fac, target_stat
     if bool_plot
         L_points = lagrangePoints(mu);
         
-        plot_fig = figure;
+        plot_fig = figure('position',[1225,453,1044,592]);
         set(gcf, 'Color', 'w');
         addToolbarExplorationButtons(gcf)
         hold on
-        %scatter3((1-mu)*LU, 0, 0,'x','DisplayName', 'Earth');
-        %scatter3(L_points(1,1)*LU, L_points(2,1)*LU, 0, 70, 'bd', 'filled', 'DisplayName', '$$L_1$$');
-        scatter3(L_points(1,2)*LU, L_points(2,2)*LU, 0, 70, 'bd', 'filled', 'DisplayName', '$$L_2$$');
-        plot3(x_old(:,1)*LU, x_old(:,2)*LU, x_old(:,3)*LU, '-','color',[59 119 8]./255,'DisplayName', 'Old Halo Orbit');
-        plot3(x_old(1,1)*LU, x_old(1,2)*LU, x_old(1,3)*LU, 'ok', 'markerfacecolor', [59 119 8]./255, 'DisplayName', 'Old Halo Initial Point');
-        plot3(x_old(end,1)*LU, x_old(end,2)*LU, x_old(end,3)*LU, 'dk', 'markerfacecolor', [59 119 8]./255, 'DisplayName', 'Old Target');
-        plot3(x_new(:,1)*LU, x_new(:,2)*LU, x_new(:,3)*LU, 'm-','DisplayName', 'New Halo Orbit');
-        plot3(x_new(1,1)*LU, x_new(1,2)*LU, x_new(1,3)*LU, 'ok', 'markerfacecolor', 'm', 'DisplayName', 'New Halo Initial Point');
-        plot3(x_new(end,1)*LU, x_new(end,2)*LU, x_new(end,3)*LU, 'dk', 'markerfacecolor', 'm', 'DisplayName', 'New Target');
+        %scatter3((1-mu), 0, 0,'x','DisplayName', 'Earth');
+        %scatter3(L_points(1,1), L_points(2,1), 0, 70, 'bd', 'filled', 'DisplayName', '$$L_1$$');
+        scatter3(L_points(1,2), L_points(2,2), L_points(3,2), 100, 'd', 'filled', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName', '$$L_2$$', 'HandleVisibility','off'); hold on
+        text(L_points(1,2), L_points(2,2), L_points(3,2)-0.00025, '$$L_2$$','HorizontalAlignment','Center','FontSize',18);
+        plot3(x_old(:,1), x_old(:,2), x_old(:,3), '-','color',[59 119 8]./255,'DisplayName', 'Old Halo Orbit');
+        plot3(x_old(1,1), x_old(1,2), x_old(1,3), 'ok', 'markerfacecolor', [59 119 8]./255, 'DisplayName', 'Old Halo Initial Point');
+        plot3(x_old(end,1), x_old(end,2), x_old(end,3), 'dk', 'markerfacecolor', [59 119 8]./255, 'DisplayName', 'Old Target');
+        plot3(x_new(:,1), x_new(:,2), x_new(:,3), 'm-','DisplayName', 'New Halo Orbit');
+        plot3(x_new(1,1), x_new(1,2), x_new(1,3), 'ok', 'markerfacecolor', 'm', 'DisplayName', 'New Halo Initial Point');
+        plot3(x_new(end,1), x_new(end,2), x_new(end,3), 'dk', 'markerfacecolor', 'm', 'DisplayName', 'New Target');
         hold off
         grid on
-        h = get(gca,'DataAspectRatio');
-        if h(3)==1
-        set(gca,'DataAspectRatio',[1 1 1])
-        else
-        set(gca,'DataAspectRatio',[1 1 1])
-        end
-        legend()
-        xlabel('$$x [km]$$')
-        ylabel('$$y [km]$$')
-        zlabel('$$z [km]$$')
+        set(gca,'DataAspectRatio',[1 1 1]);
+        legend('FontSize',15)
+        xlabel('x')
+        ylabel('y')
+        zlabel('z')
+        view([56 23])
         %title("Old and new target halo orbits")
     else
         plot_fig = [];

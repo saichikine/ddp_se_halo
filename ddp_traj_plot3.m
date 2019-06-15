@@ -1,4 +1,4 @@
-function [fig_traj, fig_control, fig_control_mag] = ddp_traj_plot3(traj)
+function [fig_traj, fig_control, fig_control_mag] = ddp_traj_plot3(traj,first_prim,second_prim)
 
     spacing = 3;
 
@@ -24,45 +24,48 @@ function [fig_traj, fig_control, fig_control_mag] = ddp_traj_plot3(traj)
         states(:,k) = traj.stage{k}.state;
     end
 
-    fig_traj = figure;
+    fig_traj = figure('position',[1388,522,1003,536]); hold on;
     addToolbarExplorationButtons(fig_traj)
-    scatter3(x_L1, 0, 0, 'd', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName','L1'); hold on
-    scatter3(x_L2, 0, 0, 'd', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName','L2');
-    plot3(1-traj.mu, 0, 0, 'ok', 'markerfacecolor', 'b', 'markersize', 10, 'DisplayName', 'Earth'); hold on % Smaller primary
-    scatter3(initial_state(1), initial_state(2), initial_state(3), 50, 'o','MarkerFaceColor','c','MarkerEdgeColor','k','DisplayName','Initial State');
-    scatter3(target_state_posvel(1), target_state_posvel(2), target_state_posvel(3), 50,'o','MarkerFaceColor','m','MarkerEdgeColor','k','DisplayName', 'Target State');
-    plot3(states(1,:), states(2,:), states(3,:), '.-', 'MarkerSize',10,'color',[0,0.4470,0.7410],'DisplayName','Trajectory');
+    earth = scatter3(1-traj.mu, 0, 0, 300,'o','filled','markerfacecolor',[58 128 242]./255,'markeredgecolor',[0, 0, 0]./255,'DisplayName',first_prim,'HandleVisibility','off');
+    text(1-traj.mu, 0, 0+0.001, first_prim,'HorizontalAlignment','Center','FontSize',16)
+    scatter3(L_points(1,1), L_points(2,1), 0, 100, 'd', 'filled', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName', '$$L_1$$', 'HandleVisibility','off');
+    text(L_points(1,1), L_points(2,1), L_points(3,1)-0.0012, '$$L_1$$','HorizontalAlignment','Center','FontSize',18);
+    scatter3(L_points(1,2), L_points(2,2), 0, 100, 'd', 'filled', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName', '$$L_2$$', 'HandleVisibility','off');
+    text(L_points(1,2), L_points(2,2), L_points(3,2)-0.0012, '$$L_2$$','HorizontalAlignment','Center','FontSize',18);
+    plot3(states(1,:), states(2,:), states(3,:), '.-', 'MarkerSize',10,'color',[0,0.4470,0.7410],'DisplayName','Trajectory','HandleVisibility','off');
     quiver3(states(1,1:spacing:end), states(2,1:spacing:end), states(3,1:spacing:end), u(1,1:spacing:end), u(2,1:spacing:end), u(3,1:spacing:end), 1.5, 'Color',[0.8500,0.3250,0.0980],'linewidth',2,'ShowArrowHead','off','DisplayName', 'Thrust Vectors');
+    scatter3(initial_state(1), initial_state(2), initial_state(3), 70, 's','MarkerFaceColor','c','MarkerEdgeColor','k','DisplayName','Initial State');
+    scatter3(target_state_posvel(1), target_state_posvel(2), target_state_posvel(3), 70,'s','MarkerFaceColor','m','MarkerEdgeColor','k','DisplayName', 'Target State');
     hold off
     grid on
-    legend();
+    legend('FontSize',16);
     set(gca,'DataAspectRatio',[1 1 1]);
-    xlabel('x')
-    ylabel('y')
-    zlabel('z')
+    xlabel('x');
+    ylabel('y');
+    zlabel('z');
     view([-37.1298828125,29.7275390625]);
-    set(gcf,'color','w')
+    set(gcf,'color','w');
 
-    fig_control = figure;
+    fig_control = figure('position',[1260,340,842,625]);
     addToolbarExplorationButtons(fig_control)
     plot(traj.stage_times(1:traj.num_stages).*TU/60/60/24, u(1,:), '.-','MarkerSize',15,'DisplayName','$$T_x$$'); hold on
     plot(traj.stage_times(1:traj.num_stages).*TU/60/60/24, u(2,:), '.-','MarkerSize',15,'DisplayName','$$T_y$$');
     plot(traj.stage_times(1:traj.num_stages).*TU/60/60/24, u(3,:), '.-','MarkerSize',15,'DisplayName','$$T_z$$'); hold off
     grid on
-    legend()
-    title('Control History')
-    ylabel('Thrust [mN]')
-    xlabel('Time [days]')
-    set(gcf,'color','w')
+    legend('FontSize',18)
+    title('Control History');
+    ylabel('Thrust [mN]');
+    xlabel('Time [days]');
+    set(gcf,'color','w');
     
-    fig_control_mag = figure;
+    fig_control_mag = figure('position',[1260,340,842,625]);
     addToolbarExplorationButtons(fig_control_mag)
     plot(traj.stage_times(1:traj.num_stages).*TU/60/60/24, u_mag, '.-','MarkerSize',15,'DisplayName','Thrust Magnitude');
     grid on
-    legend()
-    title('Control Magnitude History')
-    ylabel('Thrust Magnitude [mN]')
-    xlabel('Time [days]')
-    set(gcf,'color','w')
+    legend();
+    title('Control Magnitude History');
+    ylabel('Thrust Magnitude [mN]');
+    xlabel('Time [days]');
+    set(gcf,'color','w');
     
 end

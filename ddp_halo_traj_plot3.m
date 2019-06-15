@@ -1,4 +1,4 @@
-function [fig_traj_full, fig_control, fig_control_mag] = ddp_halo_traj_plot3(traj)
+function [fig_traj_full, fig_control, fig_control_mag] = ddp_halo_traj_plot3(traj,first_prim,second_prim)
 
     spacing = 3;
 
@@ -25,34 +25,41 @@ function [fig_traj_full, fig_control, fig_control_mag] = ddp_halo_traj_plot3(tra
     end
     
     %% Trajectory plot - just 3D
-    fig_traj = figure;
+    fig_traj = figure('position',[1388,522,1003,536]); hold on;
     addToolbarExplorationButtons(fig_traj)
-    scatter3(x_L1, 0, 0, 'd', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName','L1'); hold on
-    scatter3(x_L2, 0, 0, 'd', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName','L2');
-    plot3(1-traj.mu, 0, 0, 'ok', 'markerfacecolor', 'b', 'markersize', 10, 'DisplayName', 'Earth'); hold on % Smaller primary
-    scatter3(initial_state(1), initial_state(2), initial_state(3), 50, 'o','MarkerFaceColor','c','MarkerEdgeColor','k','DisplayName','Initial State');
-    scatter3(target_state_posvel(1), target_state_posvel(2), target_state_posvel(3), 50,'o','MarkerFaceColor','m','MarkerEdgeColor','k','DisplayName', 'Target State');
-    plot3(states(1,:), states(2,:), states(3,:), '.-', 'MarkerSize',10,'color',[0,0.4470,0.7410],'DisplayName','Trajectory');
+    earth = scatter3(1-traj.mu, 0, 0, 300,'o','filled','markerfacecolor',[58 128 242]./255,'markeredgecolor',[0, 0, 0]./255,'DisplayName',first_prim,'HandleVisibility','off');
+    text(1-traj.mu, 0, 0+0.001, first_prim,'HorizontalAlignment','Center','FontSize',16)
+    scatter3(L_points(1,1), L_points(2,1), 0, 100, 'd', 'filled', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName', '$$L_1$$', 'HandleVisibility','off');
+    text(L_points(1,1), L_points(2,1), L_points(3,1)-0.0012, '$$L_1$$','HorizontalAlignment','Center','FontSize',18);
+    scatter3(L_points(1,2), L_points(2,2), 0, 100, 'd', 'filled', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName', '$$L_2$$', 'HandleVisibility','off');
+    text(L_points(1,2), L_points(2,2), L_points(3,2)-0.0012, '$$L_2$$','HorizontalAlignment','Center','FontSize',18);
+    plot3(states(1,:), states(2,:), states(3,:), '.-', 'MarkerSize',10,'color',[0,0.4470,0.7410],'DisplayName','Trajectory','HandleVisibility','off');
     quiver3(states(1,1:spacing:end), states(2,1:spacing:end), states(3,1:spacing:end), u(1,1:spacing:end), u(2,1:spacing:end), u(3,1:spacing:end), 1.5, 'Color',[0.8500,0.3250,0.0980],'linewidth',2,'ShowArrowHead','off','DisplayName', 'Thrust Vectors');
+    scatter3(initial_state(1), initial_state(2), initial_state(3), 70, 's','MarkerFaceColor','c','MarkerEdgeColor','k','DisplayName','Initial State');
+    scatter3(target_state_posvel(1), target_state_posvel(2), target_state_posvel(3), 70,'s','MarkerFaceColor','m','MarkerEdgeColor','k','DisplayName', 'Target State');
     hold off
     grid on
-    legend();
+    legend('FontSize',16);
     set(gca,'DataAspectRatio',[1 1 1]);
-    xlabel('x')
-    ylabel('y')
-    zlabel('z')
+    xlabel('x');
+    ylabel('y');
+    zlabel('z');
     view([-37.1298828125,29.7275390625]);
-    set(gcf,'color','w')
+    set(gcf,'color','w');
     
     %% Trajectory plot - projections
     
     % xy
-    figure
-    scatter(x_L1, 0, 'd', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName','L1', 'HandleVisibility', 'off'); hold on
-    scatter(x_L2, 0, 'd', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName','L2', 'HandleVisibility', 'off');
-    plot(1-traj.mu, 0, 'ok', 'markerfacecolor', 'b', 'markersize', 10, 'DisplayName', 'Earth', 'HandleVisibility', 'off'); hold on % Smaller primary
-    scatter(initial_state(1), initial_state(2), 50, 'o','MarkerFaceColor','c','MarkerEdgeColor','k','DisplayName','Initial State', 'HandleVisibility', 'off');
-    scatter(target_state_posvel(1), target_state_posvel(2), 50,'o','MarkerFaceColor','m','MarkerEdgeColor','k','DisplayName', 'Target State', 'HandleVisibility', 'off');
+    figure('position',[1260,340,842,625]); hold on
+    earth = scatter(1-traj.mu, 0, 300,'o','filled','markerfacecolor',[58 128 242]./255,'markeredgecolor',[0, 0, 0]./255,'DisplayName',first_prim,'HandleVisibility','off');
+    text(1-traj.mu, 0+0.001, first_prim,'HorizontalAlignment','Center','FontSize',16)
+    annotation('textarrow',[0.5 0.43], [0.2 0.2], 'String',strcat("To ",second_prim),'FontSize',16,'interpreter','latex')
+    scatter(L_points(1,1), L_points(2,1), 100, 'd', 'filled', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName', '$$L_1$$', 'HandleVisibility','off');
+    text(L_points(1,1), L_points(2,1)-0.001, '$$L_1$$','HorizontalAlignment','Center','FontSize',18);
+    scatter(L_points(1,2), L_points(2,2), 100, 'd', 'filled', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName', '$$L_2$$', 'HandleVisibility','off');
+    text(L_points(1,2), L_points(2,2)-0.001, '$$L_2$$','HorizontalAlignment','Center','FontSize',18);
+    scatter(initial_state(1), initial_state(2), 70, 's','MarkerFaceColor','c','MarkerEdgeColor','k','DisplayName','Initial State', 'HandleVisibility', 'off');
+    scatter(target_state_posvel(1), target_state_posvel(2), 70,'s','MarkerFaceColor','m','MarkerEdgeColor','k','DisplayName', 'Target State', 'HandleVisibility', 'off');
     plot(states(1,:), states(2,:), '.-', 'MarkerSize',10,'color',[0,0.4470,0.7410],'DisplayName','Trajectory', 'HandleVisibility', 'off');
     quiver(states(1,1:spacing:end), states(2,1:spacing:end), u(1,1:spacing:end), u(2,1:spacing:end), 1.5, 'Color',[0.8500,0.3250,0.0980],'linewidth',2,'ShowArrowHead','off','DisplayName', 'Thrust Vectors', 'HandleVisibility', 'off');
     hold off
@@ -63,12 +70,16 @@ function [fig_traj_full, fig_control, fig_control_mag] = ddp_halo_traj_plot3(tra
     set(gcf,'color','w')
     
     % xz
-    figure
-    scatter(x_L1, 0, 'd', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName','L1', 'HandleVisibility', 'off'); hold on
-    scatter(x_L2, 0, 'd', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName','L2', 'HandleVisibility', 'off');
-    plot(1-traj.mu, 0, 'ok', 'markerfacecolor', 'b', 'markersize', 10, 'DisplayName', 'Earth', 'HandleVisibility', 'off'); hold on % Smaller primary
-    scatter(initial_state(1), initial_state(3), 50, 'o','MarkerFaceColor','c','MarkerEdgeColor','k','DisplayName','Initial State', 'HandleVisibility', 'off');
-    scatter(target_state_posvel(1), target_state_posvel(3), 50,'o','MarkerFaceColor','m','MarkerEdgeColor','k','DisplayName', 'Target State', 'HandleVisibility', 'off');
+    figure('position',[1260,340,842,625]); hold on
+    earth = scatter(1-traj.mu, 0, 300,'o','filled','markerfacecolor',[58 128 242]./255,'markeredgecolor',[0, 0, 0]./255,'DisplayName',first_prim,'HandleVisibility','off');
+    text(1-traj.mu, 0+0.001, first_prim,'HorizontalAlignment','Center','FontSize',16)
+    annotation('textarrow',[0.5 0.43], [0.32 0.32], 'String',strcat("To ",second_prim),'FontSize',16,'interpreter','latex')
+    scatter(L_points(1,1), L_points(3,1), 100, 'd', 'filled', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName', '$$L_1$$', 'HandleVisibility','off');
+    text(L_points(1,1), L_points(3,1)+0.0008, '$$L_1$$','HorizontalAlignment','Center','FontSize',18);
+    scatter(L_points(1,2), L_points(3,2), 100, 'd', 'filled', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName', '$$L_2$$', 'HandleVisibility','off');
+    text(L_points(1,2), L_points(3,2)+0.0008, '$$L_2$$','HorizontalAlignment','Center','FontSize',18);
+    scatter(initial_state(1), initial_state(3), 70, 's','MarkerFaceColor','c','MarkerEdgeColor','k','DisplayName','Initial State', 'HandleVisibility', 'off');
+    scatter(target_state_posvel(1), target_state_posvel(3), 70,'s','MarkerFaceColor','m','MarkerEdgeColor','k','DisplayName', 'Target State', 'HandleVisibility', 'off');
     plot(states(1,:), states(3,:), '.-', 'MarkerSize',10,'color',[0,0.4470,0.7410],'DisplayName','Trajectory', 'HandleVisibility', 'off');
     quiver(states(1,1:spacing:end), states(3,1:spacing:end), u(1,1:spacing:end), u(3,1:spacing:end), 1.5, 'Color',[0.8500,0.3250,0.0980],'linewidth',2,'ShowArrowHead','off','DisplayName', 'Thrust Vectors', 'HandleVisibility', 'off');
     hold off

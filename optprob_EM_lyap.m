@@ -114,7 +114,7 @@ fprintf("Done initializing.\n");
 
 %% Plot initial guess
 
-ddp_traj_plot(traj);
+ddp_traj_plot(traj,'Earth','Sun');
 
 %% DDP Loop
 
@@ -122,4 +122,4 @@ ddp_lyap_ex = ddp_func(traj,'max_iters',3000,'bool_liveplot',true);
 
 %% Plot final traj
 
-ddp_traj_plot(ddp_lyap_ex.traj);
+ddp_traj_plot(ddp_lyap_ex.traj,'Earth','Sun');

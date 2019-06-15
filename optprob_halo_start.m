@@ -79,46 +79,47 @@ fprintf("done.\n")
 toc
 
 % Plot control history
-figure
+figure('position',[1260,340,842,625]);
 addToolbarExplorationButtons(gcf)
 hold on
-plot(t_hist_ig_flight.*TU/60/60/24, thrust_hist_ig_flight(:,1), '.-', 'DisplayName', 'x thrust');
-plot(t_hist_ig_flight.*TU/60/60/24, thrust_hist_ig_flight(:,2), '.-', 'DisplayName', 'y thrust');
-plot(t_hist_ig_flight.*TU/60/60/24, thrust_hist_ig_flight(:,3), '.-', 'DisplayName', 'z thrust');
+plot(t_hist_ig_flight.*TU/60/60/24, thrust_hist_ig_flight(:,1), '.-', 'DisplayName', '$$T_x$$');
+plot(t_hist_ig_flight.*TU/60/60/24, thrust_hist_ig_flight(:,2), '.-', 'DisplayName', '$$T_y$$');
+plot(t_hist_ig_flight.*TU/60/60/24, thrust_hist_ig_flight(:,3), '.-', 'DisplayName', '$$T_z$$');
 hold off
 xlabel('Time [days]')
 ylabel('Control Thrust [$$mN$$]')
-legend()
+legend('FontSize',18)
 grid on
+set(gcf,'color','w')
 
 spacing = 20;
-figure
-addToolbarExplorationButtons(gcf) % Adds buttons to figure toolbar
-plot3(1-mu_SE, 0, 0, 'ok', 'markerfacecolor', 'b', 'markersize', 10, 'DisplayName', 'Earth'); hold on % Smaller primary
-plot3(x_L1, 0, 0, 'dk', 'markerfacecolor', 'b', 'DisplayName', '$$L_1$$'); hold on % L1 location
-plot3(x_L2, 0, 0, 'dk' , 'markerfacecolor', 'r', 'DisplayName', '$$L_2$$'); hold on % L2 location
+figure('position',[1388,522,1003,536]); hold on;
+addToolbarExplorationButtons(gcf)
+earth = scatter3(1-mu_SE, 0, 0, 300,'o','filled','markerfacecolor',[58 128 242]./255,'markeredgecolor',[0, 0, 0]./255,'DisplayName','Earth','HandleVisibility','off');
+text(1-mu_SE, 0, 0+0.001, 'Earth','HorizontalAlignment','Center','FontSize',16)
+scatter3(L_points(1,1), L_points(2,1), 0, 100, 'd', 'filled', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName', '$$L_1$$', 'HandleVisibility','off');
+text(L_points(1,1), L_points(2,1), L_points(3,1)-0.0012, '$$L_1$$','HorizontalAlignment','Center','FontSize',18);
+scatter3(L_points(1,2), L_points(2,2), 0, 100, 'd', 'filled', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName', '$$L_2$$', 'HandleVisibility','off');
+text(L_points(1,2), L_points(2,2), L_points(3,2)-0.0012, '$$L_2$$','HorizontalAlignment','Center','FontSize',18);
 for i = 1:size(arc_initial_states,2)
     node_string = "Node" + num2str(i);
     %plot3(arc_initial_states(1,i), arc_initial_states(2,i), arc_initial_states(3,i), 'o', 'DisplayName', node_string); hold on
 end
 %plot(X_hist_total_guess(1,1), X_hist_total_guess(1,2), X_hist_total_guess(1,3), 'ok', 'markerfacecolor',[244,179,66]./255, 'DisplayName', 'Initial Point'); hold on
-scatter3(initial_state_full(1), initial_state_full(2), initial_state_full(3), 50, 'o', 'filled', 'DisplayName', 'Initial Position');
-scatter3(target_state_full(1), target_state_full(2), target_state_full(3), 50, 'o', 'filled', 'DisplayName', 'Target Position');
-plot3(X_hist_ig_flight(:,1), X_hist_ig_flight(:,2), X_hist_ig_flight(:,3), '.-', 'MarkerSize',10,'color',[0,0.4470,0.7410],'DisplayName','Trajectory'); hold on
+plot3(X_hist_ig_flight(:,1), X_hist_ig_flight(:,2), X_hist_ig_flight(:,3), '.-', 'MarkerSize',10,'color',[0,0.4470,0.7410],'DisplayName','Trajectory','HandleVisibility','off'); hold on
 quiver3(X_hist_ig_flight(1:spacing:end,1),X_hist_ig_flight(1:spacing:end,2),X_hist_ig_flight(1:spacing:end,3),thrust_hist_ig_flight(1:spacing:end,1),thrust_hist_ig_flight(1:spacing:end,2),thrust_hist_ig_flight(1:spacing:end,3), 1.5, 'Color',[0.8500,0.3250,0.0980],'linewidth',2,'ShowArrowHead','off','DisplayName', 'Thrust Vectors'); hold on
+scatter3(initial_state_full(1), initial_state_full(2), initial_state_full(3), 70, 's', 'filled', 'MarkerFaceColor','c','MarkerEdgeColor','k','DisplayName', 'Initial State');
+scatter3(target_state_full(1), target_state_full(2), target_state_full(3), 70, 's', 'filled', 'MarkerFaceColor','m','MarkerEdgeColor','k','DisplayName', 'Target State');
 %title('Multiple Shooting Low-Thrust Transfer')
 xlabel('x')
 ylabel('y')
 zlabel('z')
 grid on;
-legend();
-h = get(gca,'DataAspectRatio');
-if h(3)==1
-      set(gca,'DataAspectRatio',[1 1 1])
-else
-      set(gca,'DataAspectRatio',[1 1 1])
-end
-%% DDP Parameters/Setup
+legend('FontSize',16);
+set(gca,'DataAspectRatio',[1 1 1]);
+view([-37.1298828125,29.7275390625]);
+set(gcf,'color','w');
+%% DDP Parameters/Setup1
 
 % Create empty traj struct
 num_stages = 300;
@@ -191,7 +192,7 @@ target_state_posvel = target_state_full(1:6);
 %% Get initial guess from multiple shooting and finish DDP setup
 
 % Stage times
-time_spacing_nonlinear_flag = 1;
+time_spacing_nonlinear_flag = 0;
 if time_spacing_nonlinear_flag
     stage_time_indices = floor(linspace(1,length(t_hist_ig_flight),traj.num_stages));
     stage_times = t_hist_ig_flight(stage_time_indices); % spacing based on ode output
@@ -251,7 +252,7 @@ fprintf("Done initializing.\n")
 
 %% Show initial guess results
 
-ddp_traj_plot3(traj);
+ddp_traj_plot3(traj,'Earth','Sun');
 
 %% DDP Loop
 
@@ -259,6 +260,6 @@ ddp_halo1 = ddp_func(traj,'max_iters',3000,'bool_liveplot',true);
 
 %% Plot final results
 
-ddp_traj_plot3(ddp_halo1.traj);
-ddp_halo_traj_plot3(ddp_halo1.traj)
+ddp_traj_plot3(ddp_halo1.traj,'Earth','Sun');
+ddp_halo_traj_plot3(ddp_halo1.traj,'Earth','Sun')
 ddp_conv_plot(ddp_halo1);
