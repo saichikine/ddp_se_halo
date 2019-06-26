@@ -90,12 +90,12 @@ function [fig_traj_full, fig_control, fig_control_mag] = ddp_halo_traj_plot3(tra
     set(gcf,'color','w')
     
     % yz
-    figure
-    scatter(0, 0, 'd', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName','L1', 'HandleVisibility', 'off'); hold on
-    scatter(0, 0, 'd', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName','L2', 'HandleVisibility', 'off');
-    plot(0, 0, 'ok', 'markerfacecolor', 'b', 'markersize', 10, 'DisplayName', 'Earth', 'HandleVisibility', 'off'); hold on % Smaller primary
-    scatter(initial_state(2), initial_state(3), 50, 'o','MarkerFaceColor','c','MarkerEdgeColor','k','DisplayName','Initial State', 'HandleVisibility', 'off');
-    scatter(target_state_posvel(2), target_state_posvel(3), 50,'o','MarkerFaceColor','m','MarkerEdgeColor','k','DisplayName', 'Target State', 'HandleVisibility', 'off');
+    figure('position',[1260,340,842,625]); hold on
+    earth = scatter(0, 0, 300,'o','filled','markerfacecolor',[58 128 242]./255,'markeredgecolor',[0, 0, 0]./255,'DisplayName',first_prim,'HandleVisibility','off')
+    scatter(L_points(2,2), L_points(3,2), 100, 'd', 'filled', 'MarkerFaceColor','r','MarkerEdgeColor','k','DisplayName', '$$L_2$$', 'HandleVisibility','off');
+    scatter(L_points(2,1), L_points(3,1), 100, 'd', 'filled', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName', '$$L_1$$', 'HandleVisibility','off');
+    scatter(initial_state(2), initial_state(3), 70, 's','MarkerFaceColor','c','MarkerEdgeColor','k','DisplayName','Initial State', 'HandleVisibility', 'off');
+    scatter(target_state_posvel(2), target_state_posvel(3), 70,'s','MarkerFaceColor','m','MarkerEdgeColor','k','DisplayName', 'Target State', 'HandleVisibility', 'off');
     plot(states(2,:), states(3,:), '.-', 'MarkerSize',10,'color',[0,0.4470,0.7410],'DisplayName','Trajectory', 'HandleVisibility', 'off');
     quiver(states(2,1:spacing:end), states(3,1:spacing:end), u(2,1:spacing:end), u(3,1:spacing:end), 1.5, 'Color',[0.8500,0.3250,0.0980],'linewidth',2,'ShowArrowHead','off','DisplayName', 'Thrust Vectors', 'HandleVisibility', 'off');
     hold off
