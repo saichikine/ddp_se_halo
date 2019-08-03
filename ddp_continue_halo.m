@@ -24,7 +24,7 @@ load('halo_base_good.mat');
 ddp_halo_trans_set{1} = ddp_halo1;
 ddp_conv_traj_prev = ddp_halo1.traj;
 cont_times(1) = 0;
-ddp_traj_plot3(ddp_halo1.traj);
+ddp_traj_plot3(ddp_halo1.traj,"Earth","Sun");
 
 %% Continuation part
 

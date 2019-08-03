@@ -1,5 +1,14 @@
 function [fig_traj, fig_control, fig_control_mag] = ddp_traj_plot(traj,first_prim,second_prim)
 
+    % Some (very not robust) input handling for colors
+    if strcmpi(first_prim,"earth")
+        first_prim_color = [58 128 242]./255;
+    elseif strcmpi(first_prim,"moon")
+        first_prim_color = [122 122 122]./255;
+    else
+        first_prim_color = [0 0 0]./255;
+    end
+
     spacing = 2;
 
     TU = traj.normalizers.TU;
@@ -26,7 +35,7 @@ function [fig_traj, fig_control, fig_control_mag] = ddp_traj_plot(traj,first_pri
 
     fig_traj = figure('position',[1280 600 745 480]); hold on;
     addToolbarExplorationButtons(fig_traj)
-    earth = scatter(1-traj.mu, 0, 300,'o','filled','markerfacecolor',[58 128 242]./255,'markeredgecolor',[0, 0, 0]./255,'DisplayName', first_prim, 'HandleVisibility','off');
+    first_prim_plot = scatter(1-traj.mu, 0, 300,'o','filled','markerfacecolor',first_prim_color,'markeredgecolor',[0, 0, 0]./255,'DisplayName', first_prim, 'HandleVisibility','off');
     text(1-traj.mu, 0+0.018, first_prim,'HorizontalAlignment','Center','FontSize',16)
     annotation('textarrow',[0.5 0.42], [0.25 0.25], 'String',strcat("To ",second_prim),'FontSize',16,'interpreter','latex')
     scatter(x_L1, 0, 100, 'd', 'filled', 'MarkerFaceColor','b','MarkerEdgeColor','k','DisplayName', '$$L_1$$', 'HandleVisibility','off');
